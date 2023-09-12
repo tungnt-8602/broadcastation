@@ -1,0 +1,69 @@
+package com.example.broadcastation.presentation.home
+
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
+import com.example.broadcastation.R
+import com.example.broadcastation.common.BaseFragment
+import com.example.broadcastation.databinding.HomeFragmentBinding
+import com.example.broadcastation.presentation.add.AddFragment
+
+
+class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
+    /* **********************************************************************
+     * Variable
+     ********************************************************************** */
+    private var fragmentManager : FragmentManager? = null
+    private var transaction : FragmentTransaction? = null
+
+    /* **********************************************************************
+     * Life Cycle
+     ********************************************************************** */
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if(!isAdded){
+            return
+        }
+        fragmentManager = activity?.supportFragmentManager
+        transaction = fragmentManager?.beginTransaction()
+        binding.add.setOnClickListener {
+            transaction?.replace(R.id.mainContainer, AddFragment(), null)?.commit()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    /* **********************************************************************
+     * Function
+     ********************************************************************** */
+
+    /* **********************************************************************
+     * Class
+     ********************************************************************** */
+}

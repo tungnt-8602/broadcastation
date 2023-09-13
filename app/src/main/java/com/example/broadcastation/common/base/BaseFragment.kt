@@ -1,4 +1,4 @@
-package com.example.broadcastation.common
+package com.example.broadcastation.common.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

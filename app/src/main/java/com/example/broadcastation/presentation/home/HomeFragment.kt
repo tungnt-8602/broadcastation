@@ -6,7 +6,8 @@ import android.view.View
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.broadcastation.R
-import com.example.broadcastation.common.BaseFragment
+import com.example.broadcastation.common.base.BaseFragment
+import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.HomeFragmentBinding
 import com.example.broadcastation.presentation.add.AddFragment
 
@@ -17,6 +18,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
      ********************************************************************** */
     private var fragmentManager : FragmentManager? = null
     private var transaction : FragmentTransaction? = null
+    private val logger = Logger.instance
 
     /* **********************************************************************
      * Life Cycle
@@ -28,7 +30,13 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
             return
         }
         fragmentManager = activity?.supportFragmentManager
-        transaction = fragmentManager?.beginTransaction()
+        transaction = fragmentManager?.beginTransaction()?.setCustomAnimations(
+            R.anim.slide_in,  // enter
+            R.anim.fade_out,  // exit
+            R.anim.fade_in,   // popEnter
+            R.anim.slide_out  // popExit
+        )
+        logger.i("Add button navigate to add fragment")
         binding.add.setOnClickListener {
             transaction?.replace(R.id.mainContainer, AddFragment(), null)?.commit()
         }

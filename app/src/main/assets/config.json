@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "type": 1,
+    "channel": "",
+    "content": ""
+  },
+  {
+    "id": 2,
+    "type": 2,
+    "path": "",
+    "key_value": ""
+  },
+  {
+    "id": 3,
+    "type": 3,
+    "url": "",
+    "channel": "",
+    "content": ""
+  }
+]

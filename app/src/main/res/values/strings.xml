@@ -7,7 +7,7 @@
     <string name="mqtt">Mqtt</string>
     <string name="local_title">Bluetooth</string>
     <string name="uuid">Uuid</string>
-    <string name="local_content">Content</string>
+    <string name="content">Nội dung phát</string>
     <string name="add_remote">Thêm điều khiển</string>
 
     <!-- Permission -->
@@ -20,4 +20,14 @@
     <string name="request">Request</string>
     <string name="remote_name">Tên điều khiển</string>
     <string name="save">Lưu</string>
+    <string name="key_value">Key value</string>
+    <string name="url">Url</string>
+    <string name="path">Path</string>
+    <string name="channel">Kênh</string>
+
+    <string-array name="remote_menu">
+        <item>Bluetooth</item>
+        <item>Http</item>
+        <item>Mqtt</item>
+    </string-array>
 </resources>

@@ -1,4 +1,5 @@
 package com.example.broadcastation.entity
 
-class Http {
-}
+import java.util.UUID
+
+data class Http (val domain: String, val keyValue: String, val content: String, val name: String)

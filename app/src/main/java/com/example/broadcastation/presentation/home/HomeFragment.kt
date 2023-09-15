@@ -9,15 +9,21 @@ import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
 import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.HomeFragmentBinding
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.add.AddFragment
 
 
-class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
+open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
     private var fragmentManager : FragmentManager? = null
     private var transaction : FragmentTransaction? = null
+    var remoteList = mutableListOf<Remote>()
+
+    companion object{
+        val instance = HomeFragment()
+    }
 
     /* **********************************************************************
      * Life Cycle
@@ -35,6 +41,15 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
             R.anim.fade_in,   // popEnter
             R.anim.slide_out  // popExit
         )
+
+        if(remoteList.isEmpty()){
+            binding.empty.visibility = View.VISIBLE
+            binding.remoteList.visibility = View.GONE
+        }else{
+            binding.remoteList.visibility = View.VISIBLE
+            binding.empty.visibility = View.GONE
+        }
+
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
             transaction?.replace(R.id.mainContainer, AddFragment(), null)?.commit()

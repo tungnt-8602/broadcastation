@@ -6,28 +6,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".presentation.add.local.LocalFragment">
 
-    <TextView
-        android:id="@+id/local_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginTop="@dimen/space_large"
-        android:layout_marginHorizontal="@dimen/space_large"
-        android:text="@string/local_title"/>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/device_id"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space"
+        android:layout_marginHorizontal="@dimen/space_large"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        app:layout_constraintTop_toBottomOf="@id/local_title"
-        app:layout_constraintStart_toStartOf="@id/local_title"
-        app:layout_constraintEnd_toEndOf="@id/local_title">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/device_id_text"
@@ -43,17 +31,18 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space"
+        android:layout_marginHorizontal="@dimen/space_large"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         app:layout_constraintTop_toBottomOf="@id/device_id"
-        app:layout_constraintStart_toStartOf="@id/local_title"
-        app:layout_constraintEnd_toEndOf="@id/local_title">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/local_content_text"
             android:layout_width="match_parent"
             style="@style/SettingInput"
             android:layout_height="@dimen/icon_size"
-            android:hint="@string/local_content" />
+            android:hint="@string/content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -61,10 +50,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/space"
+        android:layout_marginHorizontal="@dimen/space_large"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         app:layout_constraintTop_toBottomOf="@id/local_content"
-        app:layout_constraintStart_toStartOf="@id/local_title"
-        app:layout_constraintEnd_toEndOf="@id/local_title">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/remote_name_text"
@@ -73,15 +63,5 @@
             android:layout_height="@dimen/icon_size"
             android:hint="@string/remote_name" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <Button
-        android:id="@+id/save_remote"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_large"
-        android:text="@string/save"
-        app:layout_constraintTop_toBottomOf="@id/remote_name"
-        app:layout_constraintStart_toStartOf="@id/local_title"
-        app:layout_constraintEnd_toEndOf="@id/local_title"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

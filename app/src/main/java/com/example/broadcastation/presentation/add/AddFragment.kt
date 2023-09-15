@@ -1,27 +1,26 @@
 package com.example.broadcastation.presentation.add
 
-import android.Manifest
-import android.bluetooth.BluetoothAdapter
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import androidx.core.app.ActivityCompat
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.SpinnerAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
+import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
+import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.AddFragmentBinding
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.add.http.HttpFragment
 import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 
 
 @Suppress("DEPRECATION")
@@ -34,8 +33,9 @@ class AddFragment :
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
     private val viewModel: AddViewModel by viewModels()
-    var bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-
+    private lateinit var stringAdapter : ArrayAdapter<String>
+    private lateinit var pagerAdapter : ViewPagerAdapter
+    val home = HomeFragment.instance
 
     /* **********************************************************************
      * Life Cycle
@@ -57,39 +57,28 @@ class AddFragment :
             transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.commit()
         }
 
-        binding.addedRemote.setOnClickListener {
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.BLUETOOTH_CONNECT
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                bluetoothAdapter.enable()
-                Snackbar.make(requireContext(), binding.root, "hello", 1).show()
+        val tabs = viewModel.getTabs() ?: return
+        val listRemote = tabs.map { resources.getString(it.title) }
+        stringAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, listRemote)
+        pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
+        binding.remoteOption.adapter = stringAdapter
+        binding.viewpager.adapter = pagerAdapter
+        binding.viewpager.isUserInputEnabled = false
+        binding.remoteOption.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                // Thay đổi fragment hiện tại của viewpager.
+                binding.viewpager.currentItem = position
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                binding.viewpager.currentItem = 0
             }
         }
+        binding.saveRemote.setOnClickListener {
+            home.remoteList.add(Remote("Home", "TV Home", 1))
+            transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.commit()
 
-        val tabs = viewModel.getTabs() ?: return
-        val adapter = ViewPagerAdapter(tabs, requireActivity())
-        binding.viewpager.adapter = adapter
-        TabLayoutMediator(binding.tabBroadcast, binding.viewpager) { tab, position ->
-//            tab.text = resources.getString(tabs[position].title)
-
-            // Set the icon property
-            tab.icon = resources.getDrawable(tabs[position].icon)
-        }.attach()
-        binding.viewpager.isUserInputEnabled = false
-        binding.tabBroadcast.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                val position: Int? = tab?.position
-                if (position != null) {
-                    binding.viewpager.currentItem = position
-                    binding.tabBroadcast.selectTab(binding.tabBroadcast.getTabAt(position))
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
+        }
     }
 
     override fun onStart() {

@@ -1,4 +1,5 @@
 package com.example.broadcastation.entity
 
-class Local {
-}
+import java.util.UUID
+
+data class Local (val uuid: UUID, val content: String)

@@ -1,7 +1,11 @@
 package com.example.broadcastation.presentation.add
 
+import android.Manifest
+import android.bluetooth.BluetoothAdapter
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -10,15 +14,17 @@ import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
-import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.AddFragmentBinding
 import com.example.broadcastation.presentation.add.http.HttpFragment
 import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
+
+@Suppress("DEPRECATION")
 class AddFragment :
     BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {
     /* **********************************************************************
@@ -27,8 +33,9 @@ class AddFragment :
 
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
-    private val logger = Logger.instance
     private val viewModel: AddViewModel by viewModels()
+    var bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+
 
     /* **********************************************************************
      * Life Cycle
@@ -48,6 +55,17 @@ class AddFragment :
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
             transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.commit()
+        }
+
+        binding.addedRemote.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.BLUETOOTH_CONNECT
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                bluetoothAdapter.enable()
+                Snackbar.make(requireContext(), binding.root, "hello", 1).show()
+            }
         }
 
         val tabs = viewModel.getTabs() ?: return
@@ -105,8 +123,6 @@ class AddFragment :
     /* **********************************************************************
      * Class
      ********************************************************************** */
-
-
     private class ViewPagerAdapter(val tabs: List<AddViewModel.Tab>, activity: FragmentActivity) :
         FragmentStateAdapter(activity) {
         override fun getItemCount(): Int {

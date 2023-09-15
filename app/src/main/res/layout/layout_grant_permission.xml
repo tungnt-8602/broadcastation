@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/summary_permission"
+        app:layout_constraintEnd_toEndOf="@id/summary_permission"
+        app:layout_constraintStart_toStartOf="@id/summary_permission" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/summary_permission"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="@dimen/space"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/grant"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_larger"
+        android:layout_marginTop="24dp"
+        android:background="@color/black"
+        android:contentDescription="@string/grant"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@id/open_setting"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/summary_permission" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/open_setting"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_larger"
+        android:layout_marginTop="24dp"
+        android:background="@color/black"
+        android:contentDescription="@string/grant"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/grant"
+        app:layout_constraintTop_toBottomOf="@id/summary_permission" />
+</androidx.constraintlayout.widget.ConstraintLayout>

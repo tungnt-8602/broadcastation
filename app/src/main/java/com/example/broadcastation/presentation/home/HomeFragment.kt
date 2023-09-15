@@ -18,7 +18,6 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
      ********************************************************************** */
     private var fragmentManager : FragmentManager? = null
     private var transaction : FragmentTransaction? = null
-    private val logger = Logger.instance
 
     /* **********************************************************************
      * Life Cycle

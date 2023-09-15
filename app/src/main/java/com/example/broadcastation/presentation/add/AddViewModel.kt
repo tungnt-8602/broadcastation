@@ -1,6 +1,7 @@
 package com.example.broadcastation.presentation.add
 
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
 
@@ -9,6 +10,7 @@ class AddViewModel : BaseViewModel() {
          * Variable
          ********************************************************************** */
     private var tabs: List<Tab>? = null
+    val uuid = MutableLiveData<String>()
 
     init {
         tabs = listOf(
@@ -38,6 +40,10 @@ class AddViewModel : BaseViewModel() {
      ********************************************************************** */
     fun getTabs(): List<Tab>? {
         return tabs
+    }
+
+    fun bind(){
+        uuid.value = storage.deviceId
     }
 
     /* **********************************************************************

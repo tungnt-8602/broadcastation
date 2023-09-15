@@ -5,4 +5,19 @@
     <string name="local">Local</string>
     <string name="http">Http</string>
     <string name="mqtt">Mqtt</string>
+    <string name="local_title">Bluetooth</string>
+    <string name="uuid">Uuid</string>
+    <string name="local_content">Content</string>
+    <string name="add_remote">Thêm điều khiển</string>
+
+    <!-- Permission -->
+    <string name="summary_permission">We kindly request permission for our Android application, [BLE_APP], to access necessary device features and permissions in order to provide an optimal user experience. </string>
+    <string name="permission">Permission</string>
+    <string name="grant">Grant</string>
+    <string name="api">Error API</string>
+    <string name="summary_api">The API is currently experiencing an error. Please check your connection or try requesting again</string>
+    <string name="open_setting">Open Setting</string>
+    <string name="request">Request</string>
+    <string name="remote_name">Tên điều khiển</string>
+    <string name="save">Lưu</string>
 </resources>

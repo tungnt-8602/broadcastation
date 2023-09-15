@@ -34,6 +34,7 @@ abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) 
         _binding = null
     }
 
+
     /* **********************************************************************
      * Function - Abstract
      ********************************************************************** */

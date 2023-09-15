@@ -36,8 +36,8 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
             R.anim.fade_in,   // popEnter
             R.anim.slide_out  // popExit
         )
-        logger.i("Add button navigate to add fragment")
         binding.add.setOnClickListener {
+            logger.i("Add button navigate to add fragment")
             transaction?.replace(R.id.mainContainer, AddFragment(), null)?.commit()
         }
     }

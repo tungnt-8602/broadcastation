@@ -24,6 +24,7 @@
     <string name="url">Url</string>
     <string name="path">Path</string>
     <string name="channel">Kênh</string>
+    <string name="broadcast">Phát</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

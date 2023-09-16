@@ -21,6 +21,7 @@ import com.example.broadcastation.presentation.add.http.HttpFragment
 import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
+import com.example.broadcastation.presentation.home.HomeViewModel
 
 
 @Suppress("DEPRECATION")
@@ -33,9 +34,9 @@ class AddFragment :
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
     private val viewModel: AddViewModel by viewModels()
-    private lateinit var stringAdapter : ArrayAdapter<String>
-    private lateinit var pagerAdapter : ViewPagerAdapter
-    val home = HomeFragment.instance
+    private lateinit var stringAdapter: ArrayAdapter<String>
+    private lateinit var pagerAdapter: ViewPagerAdapter
+    private val homeViewModel: HomeViewModel by viewModels()
 
     /* **********************************************************************
      * Life Cycle
@@ -59,13 +60,22 @@ class AddFragment :
 
         val tabs = viewModel.getTabs() ?: return
         val listRemote = tabs.map { resources.getString(it.title) }
-        stringAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, listRemote)
+        stringAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_dropdown_item,
+            listRemote
+        )
         pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
         binding.remoteOption.adapter = stringAdapter
         binding.viewpager.adapter = pagerAdapter
         binding.viewpager.isUserInputEnabled = false
         binding.remoteOption.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 // Thay đổi fragment hiện tại của viewpager.
                 binding.viewpager.currentItem = position
             }
@@ -75,8 +85,10 @@ class AddFragment :
             }
         }
         binding.saveRemote.setOnClickListener {
-            home.remoteList.add(Remote("Home", "TV Home", 1))
-            transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.commit()
+            homeViewModel.addRemote(Remote("", "", 1))
+            logger.i("Add remote to : ${homeViewModel.remoteList.value}")
+//                transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.addToBackStack(null)?.commit()
+            fragmentManager?.popBackStack()
 
         }
     }

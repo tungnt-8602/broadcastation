@@ -4,13 +4,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
+import com.example.broadcastation.entity.Remote
 
 class AddViewModel : BaseViewModel() {
     /* **********************************************************************
-         * Variable
-         ********************************************************************** */
+     * Variable
+     ********************************************************************** */
+    companion object {
+        val instance = AddViewModel()
+    }
     private var tabs: List<Tab>? = null
     val uuid = MutableLiveData<String>()
+
 
     init {
         tabs = listOf(
@@ -45,6 +50,8 @@ class AddViewModel : BaseViewModel() {
     fun bind(){
         uuid.value = storage.deviceId
     }
+
+
 
     /* **********************************************************************
      * Class

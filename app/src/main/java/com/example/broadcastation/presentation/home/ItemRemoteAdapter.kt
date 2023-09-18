@@ -35,6 +35,7 @@ class ItemRemoteAdapter : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
         val item = data[position]
         with(holder.binding) {
             remoteName.text = item.name
+            remoteIcon.setImageResource(item.icon)
         }
     }
 
@@ -43,7 +44,7 @@ class ItemRemoteAdapter : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
     ********************************************************************** */
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data : MutableList<Remote>) {
-        this.data.clear()
+//        this.data.clear()
         this.data = data
         notifyDataSetChanged()
     }

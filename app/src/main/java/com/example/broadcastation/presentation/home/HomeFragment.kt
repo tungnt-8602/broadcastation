@@ -47,7 +47,7 @@ open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding:
         logger.i("1 ${viewModel.remoteList.value}")
 
 
-        viewModel.addRemote(Remote("Bluetooth", "", 1))
+        initView()
 
         val adapter = ItemRemoteAdapter()
         viewModel.remoteList.observe(viewLifecycleOwner) {
@@ -67,8 +67,7 @@ open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding:
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
-            transaction?.replace(R.id.mainContainer, AddFragment(), null)?.addToBackStack(null)
-                ?.commit()
+            transaction?.replace(R.id.mainContainer, AddFragment(), null)?.addToBackStack(null)?.commit()
         }
     }
 
@@ -76,6 +75,14 @@ open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding:
     /* **********************************************************************
      * Function
      ********************************************************************** */
+
+    private fun initView(){
+        viewModel.addRemote(Remote("Home", "", 1, R.drawable.ic_local_fill))
+        viewModel.addRemote(Remote("TV", "", 1, R.drawable.ic_http_fill))
+        viewModel.addRemote(Remote("Mobile", "", 1, R.drawable.ic_local_fill))
+        viewModel.addRemote(Remote("Ipad", "", 1, R.drawable.ic_http_fill))
+        viewModel.addRemote(Remote("Web", "", 1, R.drawable.ic_mqtt))
+    }
 
     /* **********************************************************************
      * Class

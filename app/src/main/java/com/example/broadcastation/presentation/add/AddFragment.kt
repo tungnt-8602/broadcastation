@@ -22,6 +22,7 @@ import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.HomeViewModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 @Suppress("DEPRECATION")
@@ -85,10 +86,11 @@ class AddFragment :
             }
         }
         binding.saveRemote.setOnClickListener {
-            homeViewModel.addRemote(Remote("", "", 1))
+            homeViewModel.addRemote(Remote("", "", 1, R.drawable.ic_local_fill))
             logger.i("Add remote to : ${homeViewModel.remoteList.value}")
-//                transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.addToBackStack(null)?.commit()
-            fragmentManager?.popBackStack()
+            transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.addToBackStack(null)?.commit()
+//            requireActivity().findViewById<FloatingActionButton>(R.id.add).visibility = View.VISIBLE
+//            fragmentManager?.popBackStack()
 
         }
     }

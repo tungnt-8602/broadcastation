@@ -10,24 +10,36 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/space_large">
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/remote_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@drawable/ic_local_fill"
+            android:padding="@dimen/space"/>
         <TextView
             android:id="@+id/remote_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Title"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/remote_icon"
+            app:layout_constraintStart_toEndOf="@id/remote_icon"
+            app:layout_constraintBottom_toBottomOf="@id/remote_icon"
             android:text="Bluetooth"
-            android:layout_margin="@dimen/space_large"/>
+            android:layout_margin="@dimen/space"/>
 
         <ImageView
             android:id="@+id/broadcast"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/remote_icon"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/remote_icon"
             android:src="@drawable/ic_broadcast"
             android:layout_margin="@dimen/space_large"
             android:contentDescription="@string/broadcast" />

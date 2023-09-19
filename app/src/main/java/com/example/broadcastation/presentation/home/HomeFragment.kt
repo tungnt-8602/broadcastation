@@ -3,6 +3,7 @@ package com.example.broadcastation.presentation.home
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
@@ -16,21 +17,23 @@ import com.example.broadcastation.presentation.add.AddFragment
 import com.example.broadcastation.presentation.add.AddViewModel
 
 
-open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
+ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
-    private val viewModel: HomeViewModel by viewModels()
 
     companion object {
-        val instance = HomeFragment()
+        fun newInstance(): HomeFragment {
+            return HomeFragment()
+        }
     }
 
-    /* **********************************************************************
-     * Life Cycle
-     ********************************************************************** */
+
+     /* **********************************************************************
+      * Life Cycle
+      ********************************************************************** */
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,45 +47,38 @@ open class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding:
             R.anim.fade_in,   // popEnter
             R.anim.slide_out  // popExit
         )
-        logger.i("1 ${viewModel.remoteList.value}")
-
-
-        initView()
+        logger.i("1 ${shareViewModel.remoteLiveList.value}")
 
         val adapter = ItemRemoteAdapter()
-        viewModel.remoteList.observe(viewLifecycleOwner) {
-            if (it.isEmpty()) {
-                binding.empty.visibility = View.VISIBLE
-                binding.remoteList.visibility = View.GONE
-            } else {
-                binding.remoteList.visibility = View.VISIBLE
-                binding.empty.visibility = View.GONE
-            }
-            logger.i("list: ${viewModel.remoteList.value}")
-            adapter.setData(it)
-        }
-        binding.remoteList.adapter = adapter
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        shareViewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
+            logger.i("list: $remotes")
+            adapter.setData(remotes)
+        }
+        binding.remoteList.adapter = adapter
+
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
-            transaction?.replace(R.id.mainContainer, AddFragment(), null)?.addToBackStack(null)?.commit()
+//            shareViewModel.addRemote(Remote("Data", "", 1, R.drawable.ic_local_fill))
+            transaction?.replace(R.id.mainContainer, AddFragment.newInstance(), null)?.commit()
         }
     }
 
 
-    /* **********************************************************************
-     * Function
-     ********************************************************************** */
+     /* **********************************************************************
+      * Function
+      ********************************************************************** */
+     override fun onDetach() {
+         super.onDetach()
+         logger.d("onDetach")
+     }
 
-    private fun initView(){
-        viewModel.addRemote(Remote("Home", "", 1, R.drawable.ic_local_fill))
-        viewModel.addRemote(Remote("TV", "", 1, R.drawable.ic_http_fill))
-        viewModel.addRemote(Remote("Mobile", "", 1, R.drawable.ic_local_fill))
-        viewModel.addRemote(Remote("Ipad", "", 1, R.drawable.ic_http_fill))
-        viewModel.addRemote(Remote("Web", "", 1, R.drawable.ic_mqtt))
-    }
+     override fun onResume() {
+         super.onResume()
+         logger.d("onResume")
+     }
 
     /* **********************************************************************
      * Class

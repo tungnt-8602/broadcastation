@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         logger.i("Add HomeFragment")
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
-        transaction.add(R.id.mainContainer, HomeFragment(), null)
+        transaction.add(R.id.mainContainer, HomeFragment.newInstance(), null)
             .addToBackStack(null)
             .commit()
     }

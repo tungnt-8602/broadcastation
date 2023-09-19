@@ -1,15 +1,19 @@
 package com.example.broadcastation.presentation.add
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.SpinnerAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.broadcastation.R
@@ -37,7 +41,12 @@ class AddFragment :
     private val viewModel: AddViewModel by viewModels()
     private lateinit var stringAdapter: ArrayAdapter<String>
     private lateinit var pagerAdapter: ViewPagerAdapter
-    private val homeViewModel: HomeViewModel by viewModels()
+
+    companion object {
+        fun newInstance(): AddFragment {
+            return AddFragment()
+        }
+    }
 
     /* **********************************************************************
      * Life Cycle
@@ -56,7 +65,7 @@ class AddFragment :
         )
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
-            transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.commit()
+            fragmentManager?.popBackStack()
         }
 
         val tabs = viewModel.getTabs() ?: return
@@ -66,6 +75,7 @@ class AddFragment :
             android.R.layout.simple_spinner_dropdown_item,
             listRemote
         )
+
         pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
         binding.remoteOption.adapter = stringAdapter
         binding.viewpager.adapter = pagerAdapter
@@ -86,11 +96,9 @@ class AddFragment :
             }
         }
         binding.saveRemote.setOnClickListener {
-            homeViewModel.addRemote(Remote("", "", 1, R.drawable.ic_local_fill))
-            logger.i("Add remote to : ${homeViewModel.remoteList.value}")
-            transaction?.replace(R.id.mainContainer, HomeFragment(), null)?.addToBackStack(null)?.commit()
-//            requireActivity().findViewById<FloatingActionButton>(R.id.add).visibility = View.VISIBLE
-//            fragmentManager?.popBackStack()
+            logger.i("Add remote to : ${shareViewModel.remoteLiveList.value}")
+            shareViewModel.addRemote(Remote("Data", "", 1, R.drawable.ic_local_fill))
+            transaction?.replace(R.id.mainContainer, HomeFragment.newInstance(), null)?.addToBackStack(null)?.commit()
 
         }
     }
@@ -145,6 +153,5 @@ class AddFragment :
             }
             return fragment
         }
-
     }
 }

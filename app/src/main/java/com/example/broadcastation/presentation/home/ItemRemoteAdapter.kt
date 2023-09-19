@@ -44,7 +44,6 @@ class ItemRemoteAdapter : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
     ********************************************************************** */
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data : MutableList<Remote>) {
-//        this.data.clear()
         this.data = data
         notifyDataSetChanged()
     }

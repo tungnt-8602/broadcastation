@@ -1,4 +1,4 @@
-package com.example.broadcastation.entity
+package com.example.broadcastation.entity.http
 
 import java.util.UUID
 

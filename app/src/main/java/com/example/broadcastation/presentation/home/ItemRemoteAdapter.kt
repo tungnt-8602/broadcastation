@@ -1,18 +1,21 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
+import com.google.android.material.snackbar.Snackbar
 
-class ItemRemoteAdapter : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
+class ItemRemoteAdapter(private var data: MutableList<Remote>, private var viewModel: HomeViewModel, private var load: View) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    private var data: MutableList<Remote> = mutableListOf()
 
     /* **********************************************************************
     * Life Cycle
@@ -36,6 +39,24 @@ class ItemRemoteAdapter : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
         with(holder.binding) {
             remoteName.text = item.name
             remoteIcon.setImageResource(item.icon)
+            remoteContent.text = item.describe
+        }
+        when (data[position].action) {
+            1 -> {
+                holder.binding.broadcast.setOnClickListener {
+                    Snackbar.make(it, "Bluetooth broadcast: ${item.describe}", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            2 -> {
+                holder.binding.broadcast.setOnClickListener {
+                    viewModel.postHttp(data[position], it, load)
+                }
+            }
+            3 -> {
+                holder.binding.broadcast.setOnClickListener {
+                    Snackbar.make(it, "Mqtt broadcast: ${item.describe}", Snackbar.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 

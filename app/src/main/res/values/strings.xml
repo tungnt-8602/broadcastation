@@ -18,13 +18,14 @@
     <string name="summary_api">The API is currently experiencing an error. Please check your connection or try requesting again</string>
     <string name="open_setting">Open Setting</string>
     <string name="request">Request</string>
-    <string name="remote_name">Tên điều khiển</string>
+    <string name="remote_name">Tên điều khiển <font color="#B3261E">*</font></string>
     <string name="save">Lưu</string>
-    <string name="key_value">Key value</string>
-    <string name="url">Url</string>
-    <string name="path">Path</string>
-    <string name="channel">Kênh</string>
+    <string name="key_value">Key value <font color="#B3261E">*</font></string>
+    <string name="url">Url <font color="#B3261E">*</font></string>
+    <string name="path">Path <font color="#B3261E">*</font></string>
+    <string name="channel">Kênh <font color="#B3261E">*</font></string>
     <string name="broadcast">Phát</string>
+    <string name="remote_icon">Icon</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

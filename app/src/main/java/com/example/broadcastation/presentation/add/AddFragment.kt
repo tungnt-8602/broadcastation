@@ -65,7 +65,7 @@ class AddFragment :
         )
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
-            fragmentManager?.popBackStack()
+            transaction?.replace(R.id.mainContainer, HomeFragment.newInstance(), null)?.addToBackStack(null)?.commit()
         }
 
         val tabs = viewModel.getTabs() ?: return
@@ -87,7 +87,6 @@ class AddFragment :
                 position: Int,
                 id: Long
             ) {
-                // Thay đổi fragment hiện tại của viewpager.
                 binding.viewpager.currentItem = position
             }
 
@@ -96,37 +95,14 @@ class AddFragment :
             }
         }
         binding.saveRemote.setOnClickListener {
-            logger.i("Add remote to : ${shareViewModel.remoteLiveList.value}")
             shareViewModel.addRemote(Remote("Data", "", 1, R.drawable.ic_local_fill))
+            logger.i("Add remote to live data : ${shareViewModel.remoteLiveList.value}")
+            logger.i("Add remote to list: ${shareViewModel.remoteList}")
             transaction?.replace(R.id.mainContainer, HomeFragment.newInstance(), null)?.addToBackStack(null)?.commit()
 
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
-
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
     /* **********************************************************************
      * Function
      ********************************************************************** */

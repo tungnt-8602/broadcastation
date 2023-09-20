@@ -15,9 +15,10 @@ import com.example.broadcastation.databinding.HomeFragmentBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.add.AddFragment
 import com.example.broadcastation.presentation.add.AddViewModel
+import com.google.android.material.snackbar.Snackbar
 
 
- class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
+class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
@@ -49,23 +50,21 @@ import com.example.broadcastation.presentation.add.AddViewModel
         )
         logger.i("1 ${shareViewModel.remoteLiveList.value}")
 
-        val adapter = ItemRemoteAdapter()
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         shareViewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
+            val adapter = ItemRemoteAdapter(remotes, shareViewModel, binding.idLoadingPB)
             logger.i("list: $remotes")
             adapter.setData(remotes)
+            binding.remoteList.adapter = adapter
         }
-        binding.remoteList.adapter = adapter
-
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
-//            shareViewModel.addRemote(Remote("Data", "", 1, R.drawable.ic_local_fill))
-            transaction?.replace(R.id.mainContainer, AddFragment.newInstance(), null)?.commit()
+            fragmentManager?.saveFragmentInstanceState(this)
+            transaction?.replace(R.id.mainContainer, AddFragment.newInstance(), "tag")?.addToBackStack(null)?.commit()
         }
     }
-
 
      /* **********************************************************************
       * Function

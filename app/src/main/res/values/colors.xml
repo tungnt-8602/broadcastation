@@ -3,4 +3,17 @@
     <color name="transparent">#00000000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="sound_cloud_color">#FF3300</color>
+    <color name="scc_100">#fbb29f</color>
+    <color name="scc_200">#f59279</color>
+    <color name="scc_300">#f37e60</color>
+    <color name="scc_400">#fb7451</color>
+    <color name="scc_500">#f7623c</color>
+    <color name="scc_600">#f55228</color>
+    <color name="scc_700">#f93e0e</color>
+    <color name="scc_800">#ff3400</color>
+    <color name="scc_900">#e53001</color>
+
+    <color name="background">#E3E3E3</color>
 </resources>

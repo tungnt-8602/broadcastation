@@ -1,5 +1,6 @@
 <resources>
     <!-- Common -->
+    <dimen name="minus_space_small">-4dp</dimen>
     <dimen name="space">8dp</dimen>
     <dimen name="space_small">4dp</dimen>
     <dimen name="space_tiny">2dp</dimen>

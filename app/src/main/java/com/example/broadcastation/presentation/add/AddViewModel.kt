@@ -13,6 +13,7 @@ class AddViewModel : BaseViewModel() {
     companion object {
         val instance = AddViewModel()
     }
+
     private var tabs: List<Tab>? = null
     val uuid = MutableLiveData<String>()
 
@@ -47,11 +48,9 @@ class AddViewModel : BaseViewModel() {
         return tabs
     }
 
-    fun bind(){
+    fun bind() {
         uuid.value = storage.deviceId
     }
-
-
 
     /* **********************************************************************
      * Class

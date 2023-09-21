@@ -3,6 +3,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://repo.eclipse.org/content/repositories/paho-snapshots/")
     }
 }
 dependencyResolutionManagement {

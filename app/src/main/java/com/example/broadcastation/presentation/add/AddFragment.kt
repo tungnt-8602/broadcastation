@@ -27,6 +27,7 @@ import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.HomeViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 
 @Suppress("DEPRECATION")
@@ -39,7 +40,8 @@ class AddFragment :
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
     private val viewModel: AddViewModel by viewModels()
-    private lateinit var stringAdapter: ArrayAdapter<String>
+    private lateinit var categoryAdapter: ArrayAdapter<String>
+    private lateinit var optionAdapter: ArrayAdapter<String>
     private lateinit var pagerAdapter: ViewPagerAdapter
 
     companion object {
@@ -69,37 +71,48 @@ class AddFragment :
         }
 
         val tabs = viewModel.getTabs() ?: return
-        val listRemote = tabs.map { resources.getString(it.title) }
-        stringAdapter = ArrayAdapter(
+        val listRemote = resources.getStringArray(R.array.remote_menu)
+        val listCategoryRemote = resources.getStringArray(R.array.remote_category)
+        categoryAdapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
+            R.layout.dropdown_item,
+            listCategoryRemote
+        )
+        optionAdapter = ArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_item,
             listRemote
         )
 
         pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
-        binding.remoteOption.adapter = stringAdapter
-        binding.viewpager.adapter = pagerAdapter
-        binding.viewpager.isUserInputEnabled = false
-        binding.remoteOption.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                binding.viewpager.currentItem = position
-            }
+        binding.categoryNameText.setAdapter(categoryAdapter)
+        binding.optionNameText.setAdapter(optionAdapter)
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                binding.viewpager.currentItem = 0
-            }
-        }
         binding.saveRemote.setOnClickListener {
             shareViewModel.addRemote(Remote("Data", "", 1, R.drawable.ic_local_fill))
             logger.i("Add remote to live data : ${shareViewModel.remoteLiveList.value}")
             logger.i("Add remote to list: ${shareViewModel.remoteList}")
             transaction?.replace(R.id.mainContainer, HomeFragment.newInstance(), null)?.addToBackStack(null)?.commit()
+        }
 
+        binding.optionNameText.setOnItemClickListener { adapterView, view, i, l ->
+            when (i) {
+                0 -> {
+                    binding.local.root.visibility = View.VISIBLE
+                    binding.http.root.visibility = View.GONE
+                    binding.mqtt.root.visibility = View.GONE
+                }
+                1 -> {
+                    binding.local.root.visibility = View.GONE
+                    binding.http.root.visibility = View.VISIBLE
+                    binding.mqtt.root.visibility = View.GONE
+                }
+                else -> {
+                    binding.local.root.visibility = View.GONE
+                    binding.http.root.visibility = View.GONE
+                    binding.mqtt.root.visibility = View.VISIBLE
+                }
+            }
         }
     }
 

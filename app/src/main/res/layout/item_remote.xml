@@ -1,65 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/space_large"
-    android:layout_marginVertical="@dimen/space"
-    app:cardCornerRadius="@dimen/space">
+    android:background="@color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ImageView
+        android:id="@+id/remote_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/space_large"
+        android:layout_marginStart="@dimen/space"
+        android:contentDescription="@string/remote_icon"
+        android:padding="@dimen/space"
+        android:src="@drawable/ic_local_fill"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/remote_name"
+        style="@style/Title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_large"
+        android:text="@string/app_name"
+        app:layout_constraintBottom_toTopOf="@id/remote_content"
+        app:layout_constraintEnd_toStartOf="@id/broadcast"
+        app:layout_constraintStart_toEndOf="@id/remote_icon"
+        app:layout_constraintTop_toTopOf="@id/remote_icon" />
+
+    <TextView
+        android:id="@+id/remote_content"
+        style="@style/Content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_large"
+        android:text="@string/app_name"
+        app:layout_constraintBottom_toBottomOf="@id/remote_icon"
+        app:layout_constraintEnd_toStartOf="@id/broadcast"
+        app:layout_constraintStart_toEndOf="@id/remote_icon"
+        app:layout_constraintTop_toBottomOf="@id/remote_name" />
+
+    <ImageButton
+        android:id="@+id/broadcast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/space_large"
+        android:backgroundTint="@color/white"
+        android:contentDescription="@string/broadcast"
+        android:padding="@dimen/space"
+        android:src="@drawable/ic_broadcast"
+        app:layout_constraintBottom_toBottomOf="@id/remote_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/remote_icon" />
+
+    <com.google.android.material.divider.MaterialDivider
+        android:id="@+id/bot_div"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingVertical="@dimen/space">
-
-        <ImageView
-            android:id="@+id/remote_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space"
-            android:padding="@dimen/space"
-            android:src="@drawable/ic_local_fill"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/remote_icon" />
-
-        <TextView
-            android:id="@+id/remote_name"
-            style="@style/Title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:layout_marginStart="@dimen/space_large"
-            app:layout_constraintBottom_toTopOf="@id/remote_content"
-            app:layout_constraintStart_toEndOf="@id/remote_icon"
-            app:layout_constraintEnd_toStartOf="@id/broadcast"
-            app:layout_constraintTop_toTopOf="@id/remote_icon" />
-
-        <TextView
-            android:id="@+id/remote_content"
-            style="@style/Content"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_large"
-            android:text="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="@id/remote_icon"
-            app:layout_constraintStart_toEndOf="@id/remote_icon"
-            app:layout_constraintEnd_toStartOf="@id/broadcast"
-            app:layout_constraintTop_toBottomOf="@id/remote_name" />
-
-        <ImageView
-            android:id="@+id/broadcast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_large"
-            android:padding="@dimen/space"
-            android:contentDescription="@string/broadcast"
-            android:src="@drawable/ic_broadcast"
-            app:layout_constraintBottom_toBottomOf="@id/remote_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/remote_icon" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-</androidx.cardview.widget.CardView>
+        android:layout_height="1dp"
+        app:dividerColor="@color/scc_300"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

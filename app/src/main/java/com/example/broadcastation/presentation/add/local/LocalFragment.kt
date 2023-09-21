@@ -17,11 +17,12 @@ class LocalFragment : BaseFragment<FragmentLocalBinding>(FragmentLocalBinding::i
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        logger.i("Get data uuid")
+        viewModel.bind()
         logger.i("Paste uuid in edittext")
         viewModel.uuid.observe(viewLifecycleOwner){
             binding.deviceIdText.setText(it)
         }
-        logger.i("Get data uuid")
-        viewModel.bind()
+
     }
 }

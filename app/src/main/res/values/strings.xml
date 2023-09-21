@@ -26,10 +26,22 @@
     <string name="channel">Kênh <font color="#B3261E">*</font></string>
     <string name="broadcast">Phát</string>
     <string name="remote_icon">Icon</string>
+    <string name="remote_description">Mô tả</string>
+    <string name="remote_category">Phân theo địa điểm <font color="#B3261E">*</font></string>
+    <string name="remote_option">Phân theo phương thức phát <font color="#B3261E">*</font></string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>
         <item>Http</item>
         <item>Mqtt</item>
+    </string-array>
+
+    <string-array name="remote_category">
+        <item>Nhà riêng</item>
+        <item>Cơ quan</item>
+        <item>Quê nội</item>
+        <item>Quê ngoại</item>
+        <item>Trường đại học</item>
+        <item>Khách sạn</item>
     </string-array>
 </resources>

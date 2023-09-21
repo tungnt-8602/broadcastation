@@ -23,10 +23,10 @@ class HomeViewModel : BaseViewModel() {
     private val BASE_URL = "https://reqres.in/api/"
 
     init {
-        remoteList.add(Remote("Home", "Bluetooth", 1, R.drawable.ic_local_fill))
-        remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http_fill))
-        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local_fill))
-        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http_fill))
+        remoteList.add(Remote("Home", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
         remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
         remoteLiveList.postValue(remoteList)
     }

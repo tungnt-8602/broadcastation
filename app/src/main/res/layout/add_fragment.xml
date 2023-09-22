@@ -8,7 +8,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/add_bar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/space"
-            android:padding="@dimen/space"
+            android:padding="@dimen/space_large"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,14 +38,15 @@
 
         <ImageView
             android:id="@+id/endPadding"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="56dp"
+            android:layout_height="0dp"
             android:layout_marginStart="@dimen/space"
             android:layout_marginEnd="@dimen/space"
+            android:scaleType="fitXY"
             android:contentDescription="@string/app_name"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/backToHome"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/backToHome" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -67,7 +68,9 @@
             android:layout_marginTop="@dimen/space"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/ic_remote_name"
+            app:startIconTint="@color/scc_800">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/remote_name_text"
@@ -87,7 +90,9 @@
             android:layout_marginTop="@dimen/space_small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/remote_name">
+            app:layout_constraintTop_toBottomOf="@id/remote_name"
+            app:startIconDrawable="@drawable/ic_remote_des"
+            app:startIconTint="@color/scc_800">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/remote_description_text"
@@ -105,10 +110,12 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_large"
             android:layout_marginTop="@dimen/space_small"
+            app:endIconTint="@color/scc_800"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/remote_description"
-            app:startIconDrawable="@drawable/ic_category_remote">
+            app:startIconDrawable="@drawable/ic_category_remote"
+            app:startIconTint="@color/scc_800">
 
             <AutoCompleteTextView
                 android:id="@+id/category_name_text"
@@ -134,16 +141,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_large"
-            android:layout_marginTop="@dimen/minus_space_small"
+            android:paddingBottom="@dimen/space"
+            app:endIconTint="@color/scc_800"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:startIconDrawable="@drawable/ic_remote_option">
+            app:startIconDrawable="@drawable/ic_remote_option"
+            app:startIconTint="@color/scc_800">
 
             <AutoCompleteTextView
                 android:id="@+id/option_name_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:focusable="false"
                 android:hint="@string/remote_option"
                 android:labelFor="@id/option_remote" />
         </com.google.android.material.textfield.TextInputLayout>

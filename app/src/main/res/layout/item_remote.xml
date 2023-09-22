@@ -15,9 +15,9 @@
         android:contentDescription="@string/remote_icon"
         android:padding="@dimen/space"
         android:src="@drawable/ic_local_fill"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/broadcast"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/broadcast" />
 
     <TextView
         android:id="@+id/remote_name"
@@ -46,20 +46,19 @@
     <ImageButton
         android:id="@+id/broadcast"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/space_large"
+        android:layout_height="match_parent"
         android:backgroundTint="@color/white"
         android:contentDescription="@string/broadcast"
-        android:padding="@dimen/space"
+        android:padding="@dimen/space_larges"
         android:src="@drawable/ic_broadcast"
-        app:layout_constraintBottom_toBottomOf="@id/remote_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/remote_icon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/bot_div"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        app:dividerColor="@color/scc_300"
+        app:dividerColor="@color/background"
         app:layout_constraintBottom_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

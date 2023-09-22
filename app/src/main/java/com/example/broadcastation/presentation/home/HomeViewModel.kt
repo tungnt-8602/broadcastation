@@ -18,13 +18,28 @@ class HomeViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    var remoteLiveList = MutableLiveData(mutableListOf<Remote>())
+    var remoteLiveList = MutableLiveData<MutableList<Remote>>()
     var remoteList = mutableListOf<Remote>()
     private val BASE_URL = "https://reqres.in/api/"
+    val notice = MutableLiveData<String>()
 
     init {
         remoteList.add(Remote("Home", "Bluetooth", 1, R.drawable.ic_local))
         remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
+        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
+        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
+        remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
+        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
+        remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
         remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
         remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
         remoteList.add(Remote("Web", "Mqtt", 3, R.drawable.ic_mqtt))
@@ -40,7 +55,7 @@ class HomeViewModel : BaseViewModel() {
         remoteLiveList.postValue(remoteList)
     }
 
-    fun postHttp(remote: Remote, view: View, loadView: View){
+    fun postHttp(remote: Remote, loadView: View){
         loadView.visibility = View.VISIBLE
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -51,16 +66,23 @@ class HomeViewModel : BaseViewModel() {
         call!!.enqueue(object : Callback<Remote?> {
             override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
                 loadView.visibility = View.GONE
-                Snackbar.make(view, response.body()?.describe ?: "Nothing to show", Snackbar.LENGTH_SHORT).show()
+                notice.value = response.body()?.describe ?: "Nothing to show"
             }
 
             override fun onFailure(call: Call<Remote?>, t: Throwable) {
                 loadView.visibility = View.GONE
-                Snackbar.make(view, "Error found is : " + t.message, Snackbar.LENGTH_SHORT).show()
+                notice.value = "Error found is : " + t.message
             }
         })
     }
 
+    fun shareBluetooth(remote: Remote, loadView: View){
+        notice.value = "Bluetooth broadcast: ${remote.name}"
+    }
+
+    fun publishMqtt(remote: Remote, loadView: View){
+        notice.value = "Mqtt broadcast: ${remote.name}"
+    }
 
     /* **********************************************************************
     * Class

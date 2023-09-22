@@ -3,7 +3,7 @@
     <style name="Base.Theme.Broadcastation" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/sound_cloud_color</item>
-        <item name="colorPrimaryContainer">@color/scc_600</item>
+        <item name="colorPrimaryContainer">@color/scc_300</item>
     </style>
 
     <style name="Theme.Broadcastation" parent="Base.Theme.Broadcastation" />

@@ -18,17 +18,17 @@
     <string name="summary_api">The API is currently experiencing an error. Please check your connection or try requesting again</string>
     <string name="open_setting">Open Setting</string>
     <string name="request">Request</string>
-    <string name="remote_name">Tên điều khiển <font color="#B3261E">*</font></string>
+    <string name="remote_name">Tên điều khiển <font color="#e53001">*</font></string>
     <string name="save">Lưu</string>
-    <string name="key_value">Key value <font color="#B3261E">*</font></string>
-    <string name="url">Url <font color="#B3261E">*</font></string>
-    <string name="path">Path <font color="#B3261E">*</font></string>
-    <string name="channel">Kênh <font color="#B3261E">*</font></string>
+    <string name="key_value">Key value <font color="#e53001">*</font></string>
+    <string name="url">Url <font color="#e53001">*</font></string>
+    <string name="path">Path <font color="#e53001">*</font></string>
+    <string name="channel">Kênh <font color="#e53001">*</font></string>
     <string name="broadcast">Phát</string>
     <string name="remote_icon">Icon</string>
     <string name="remote_description">Mô tả</string>
-    <string name="remote_category">Phân theo địa điểm <font color="#B3261E">*</font></string>
-    <string name="remote_option">Phân theo phương thức phát <font color="#B3261E">*</font></string>
+    <string name="remote_category">Danh mục <font color="#e53001">*</font></string>
+    <string name="remote_option">Phương thức phát <font color="#e53001">*</font></string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

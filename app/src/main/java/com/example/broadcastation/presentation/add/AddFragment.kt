@@ -114,6 +114,7 @@ class AddFragment :
                 }
             }
         }
+        binding.optionNameText.inputType = android.text.InputType.TYPE_CLASS_TEXT
     }
 
     /* **********************************************************************

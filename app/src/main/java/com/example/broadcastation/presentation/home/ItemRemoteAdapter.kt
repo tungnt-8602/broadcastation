@@ -44,17 +44,17 @@ class ItemRemoteAdapter(private var data: MutableList<Remote>, private var viewM
         when (data[position].action) {
             1 -> {
                 holder.binding.broadcast.setOnClickListener {
-                    Snackbar.make(it, "Bluetooth broadcast: ${item.describe}", Snackbar.LENGTH_SHORT).show()
+                    viewModel.shareBluetooth(data[position], load)
                 }
             }
             2 -> {
                 holder.binding.broadcast.setOnClickListener {
-                    viewModel.postHttp(data[position], it, load)
+                    viewModel.postHttp(data[position], load)
                 }
             }
             3 -> {
                 holder.binding.broadcast.setOnClickListener {
-                    Snackbar.make(it, "Mqtt broadcast: ${item.describe}", Snackbar.LENGTH_SHORT).show()
+                    viewModel.publishMqtt(data[position], load)
                 }
             }
         }

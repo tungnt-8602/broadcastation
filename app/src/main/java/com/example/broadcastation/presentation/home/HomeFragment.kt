@@ -24,6 +24,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
     private var transaction: FragmentTransaction? = null
+    private val viewModel: HomeViewModel by viewModels()
 
     companion object {
         fun newInstance(): HomeFragment {
@@ -61,8 +62,14 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
+//            addViewModel.addRemote(Remote("Data", "Khách sạn", 1, R.drawable.ic_local))
             fragmentManager?.saveFragmentInstanceState(this)
-            transaction?.replace(R.id.mainContainer, AddFragment.newInstance(), "tag")?.addToBackStack(null)?.commit()
+            transaction?.add(R.id.mainContainer, AddFragment.newInstance(), "tag")?.addToBackStack(null)?.commit()
+        }
+
+        viewModel.notice.observe(viewLifecycleOwner) { message ->
+            logger.d(message)
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).setAnchorView(binding.add).show()
         }
     }
 

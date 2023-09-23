@@ -13,13 +13,13 @@ import com.example.broadcastation.presentation.home.HomeViewModel
 typealias Inflate<VB> = (LayoutInflater, ViewGroup?, Boolean) -> VB
 
 abstract class BaseFragment<VB : ViewBinding>(private val inflate: Inflate<VB>) : Fragment(){
+
     /* **********************************************************************
-     * Variable
-     ********************************************************************** */
+         * Variable
+         ********************************************************************** */
     private var _binding: VB? = null
     protected val binding: VB get() = _binding!!
     protected val logger: Logger = Logger.instance
-    protected val shareViewModel: HomeViewModel by viewModels()
     /* **********************************************************************
      * Life Cycle
      ********************************************************************** */

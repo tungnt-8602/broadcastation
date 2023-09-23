@@ -10,12 +10,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
+import com.example.broadcastation.presentation.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
-class ItemRemoteAdapter(private var data: MutableList<Remote>, private var viewModel: HomeViewModel, private var load: View) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
+class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load: View) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
     /* **********************************************************************
      * Variable
      ********************************************************************** */
+    private var data: MutableList<Remote> = mutableListOf<Remote>()
+    private var onItemTouchListener : ((Remote) -> Unit)? = null
 
     /* **********************************************************************
     * Life Cycle
@@ -58,6 +61,10 @@ class ItemRemoteAdapter(private var data: MutableList<Remote>, private var viewM
                 }
             }
         }
+
+        holder.binding.root.setOnClickListener {
+            onItemTouchListener?.let { it1 -> it1(data[position]) }
+        }
     }
 
     /* **********************************************************************
@@ -66,6 +73,12 @@ class ItemRemoteAdapter(private var data: MutableList<Remote>, private var viewM
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data : MutableList<Remote>) {
         this.data = data
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setOnItemTouchListener(listener: (Remote) -> Unit) {
+        this.onItemTouchListener = listener
         notifyDataSetChanged()
     }
 

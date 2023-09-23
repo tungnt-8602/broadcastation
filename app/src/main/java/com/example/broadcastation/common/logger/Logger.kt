@@ -13,7 +13,7 @@ class Logger(
      * Singleton
      ********************************************************************** */
     companion object {
-        val instance = Logger()
+        var instance = Logger()
     }
     /* **********************************************************************
      * Variable

@@ -1,20 +1,28 @@
 package com.example.broadcastation.presentation.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import androidx.fragment.app.Fragment
+import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.commit
+import androidx.fragment.app.setFragmentResult
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
-import com.example.broadcastation.common.logger.Logger
+import com.example.broadcastation.common.utility.DESC_ARG
+import com.example.broadcastation.common.utility.DESC_REQUEST_KEY
+import com.example.broadcastation.common.utility.EDIT_ARG
+import com.example.broadcastation.common.utility.EDIT_REQUEST_KEY
+import com.example.broadcastation.common.utility.EDIT_TITLE
+import com.example.broadcastation.common.utility.ICON_ARG
+import com.example.broadcastation.common.utility.ICON_REQUEST_KEY
+import com.example.broadcastation.common.utility.NAME_ARG
+import com.example.broadcastation.common.utility.NAME_REQUEST_KEY
+import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.databinding.HomeFragmentBinding
-import com.example.broadcastation.entity.Remote
+import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
-import com.example.broadcastation.presentation.add.AddViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -23,8 +31,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
      * Variable
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
-    private var transaction: FragmentTransaction? = null
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: MainViewModel by activityViewModels()
 
     companion object {
         fun newInstance(): HomeFragment {
@@ -32,10 +39,9 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
         }
     }
 
-
-     /* **********************************************************************
-      * Life Cycle
-      ********************************************************************** */
+    /* **********************************************************************
+     * Life Cycle
+     ********************************************************************** */
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,48 +49,63 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
             return
         }
         fragmentManager = activity?.supportFragmentManager
-        transaction = fragmentManager?.beginTransaction()?.setCustomAnimations(
-            R.anim.slide_in,  // enter
-            R.anim.fade_out,  // exit
-            R.anim.fade_in,   // popEnter
-            R.anim.slide_out  // popExit
-        )
-        logger.i("1 ${shareViewModel.remoteLiveList.value}")
 
+        logger.i("Recycler view")
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        shareViewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
-            val adapter = ItemRemoteAdapter(remotes, shareViewModel, binding.idLoadingPB)
+        val adapter = ItemRemoteAdapter(viewModel, binding.idLoadingPB)
+        viewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
             logger.i("list: $remotes")
             adapter.setData(remotes)
             binding.remoteList.adapter = adapter
         }
 
-        binding.add.setOnClickListener {
-            logger.i("Add button navigate to add fragment")
-//            addViewModel.addRemote(Remote("Data", "Khách sạn", 1, R.drawable.ic_local))
-            fragmentManager?.saveFragmentInstanceState(this)
-            transaction?.add(R.id.mainContainer, AddFragment.newInstance(), "tag")?.addToBackStack(null)?.commit()
+        logger.i("Item navigate: Update remote")
+        adapter.setOnItemTouchListener {
+            setFragmentResult(EDIT_REQUEST_KEY, bundleOf(EDIT_ARG to EDIT_TITLE))
+            setFragmentResult(NAME_REQUEST_KEY, bundleOf(NAME_ARG to it.name))
+            setFragmentResult(DESC_REQUEST_KEY, bundleOf(DESC_ARG to it.describe))
+            setFragmentResult(ICON_REQUEST_KEY, bundleOf(ICON_ARG to it.icon))
+            fragmentManager?.commit {
+                setCustomAnimations(
+                    R.anim.slide_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.slide_out
+                )
+                replace(R.id.mainContainer, AddFragment(), null)
+                addToBackStack(null)
+                setReorderingAllowed(true)
+            }
         }
 
+        binding.add.setOnClickListener {
+            logger.i("Add button navigate to add fragment")
+            fragmentManager?.saveFragmentInstanceState(this)
+            fragmentManager?.commit {
+                setCustomAnimations(
+                    R.anim.slide_in,
+                    R.anim.fade_out,
+                    R.anim.fade_in,
+                    R.anim.slide_out
+                )
+                replace(R.id.mainContainer, AddFragment(), TAG_ADD_FRAGMENT)
+                addToBackStack(null)
+                setReorderingAllowed(true)
+            }
+        }
+
+        logger.i("Message after action")
         viewModel.notice.observe(viewLifecycleOwner) { message ->
             logger.d(message)
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).setAnchorView(binding.add).show()
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).setAnchorView(binding.add)
+                .show()
         }
     }
 
-     /* **********************************************************************
-      * Function
-      ********************************************************************** */
-     override fun onDetach() {
-         super.onDetach()
-         logger.d("onDetach")
-     }
-
-     override fun onResume() {
-         super.onResume()
-         logger.d("onResume")
-     }
+    /* **********************************************************************
+     * Function
+     ********************************************************************** */
 
     /* **********************************************************************
      * Class

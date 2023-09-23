@@ -29,6 +29,7 @@
     <string name="remote_description">Mô tả</string>
     <string name="remote_category">Danh mục <font color="#e53001">*</font></string>
     <string name="remote_option">Phương thức phát <font color="#e53001">*</font></string>
+    <string name="delete">Xóa</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

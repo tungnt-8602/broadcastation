@@ -2,6 +2,7 @@ package com.example.broadcastation.common.base
 
 import androidx.lifecycle.ViewModel
 import com.example.broadcastation.common.logger.Logger
+import com.example.broadcastation.control.LocalControl
 import com.example.broadcastation.control.StorageControl
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +16,7 @@ abstract class BaseViewModel : ViewModel() {
     internal val gson = Gson()
     internal val logger = Logger.instance
     protected val storage = StorageControl.instance
+    internal val local = LocalControl.getInstance()
 
     private val job = SupervisorJob()
     protected val scope = CoroutineScope(Dispatchers.IO + job)

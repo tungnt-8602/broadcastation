@@ -83,8 +83,6 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         val permissions = arrayListOf(
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_ADVERTISE
@@ -101,8 +99,6 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         val permissions = arrayListOf(
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
         )
         requestM.launch(permissions.toTypedArray())
@@ -137,7 +133,6 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 logger.i("Granted : ACTION_REQUEST_ENABLE")
-//                callbackCall(CallbackAction.SUCCESS)
             } else {
                 logger.i("Denied : ACTION_REQUEST_ENABLE")
                 callbackCall(CallbackAction.FAIL, "${result.resultCode}")
@@ -148,10 +143,8 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 logger.i("Granted : ACTION_REQUEST_ENABLE")
-//                callbackCall(CallbackAction.SUCCESS)
             } else {
                 logger.i("Denied : ACTION_REQUEST_ENABLE")
-//                callbackCall(CallbackAction.FAIL, "${result.resultCode}")
             }
         }
 

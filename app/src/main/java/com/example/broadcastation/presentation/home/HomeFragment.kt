@@ -20,7 +20,9 @@ import com.example.broadcastation.common.utility.ICON_REQUEST_KEY
 import com.example.broadcastation.common.utility.NAME_ARG
 import com.example.broadcastation.common.utility.NAME_REQUEST_KEY
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
+import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.HomeFragmentBinding
+import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
 import com.google.android.material.snackbar.Snackbar
@@ -53,7 +55,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
         logger.i("Recycler view")
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val adapter = ItemRemoteAdapter(viewModel, binding.idLoadingPB)
+        val adapter = ItemRemoteAdapter(viewModel, binding.idLoadingPB, (activity as MainActivity))
         viewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
             logger.i("list: $remotes")
             adapter.setData(remotes)

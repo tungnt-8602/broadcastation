@@ -6,14 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
+import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.google.android.material.snackbar.Snackbar
 
-class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load: View) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
+class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load: View, private var activity: MainActivity) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
     /* **********************************************************************
      * Variable
      ********************************************************************** */
@@ -48,6 +50,7 @@ class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load:
             1 -> {
                 holder.binding.broadcast.setOnClickListener {
                     viewModel.shareBluetooth(data[position], load)
+                    activity.grantPermission()
                 }
             }
             2 -> {

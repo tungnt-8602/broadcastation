@@ -38,4 +38,22 @@ class MainActivity : AppCompatActivity() {
             .addToBackStack(null)
             .commit()
     }
+
+    /* **********************************************************************
+     * Function
+     ********************************************************************** */
+     fun grantPermission() {
+        permission.registerCallback(MainActivity::class.java.name,
+            object : PermissionControl.PermissionCallback {
+                override fun grantSuccess() {
+                    permission.turnOnBluetooth()
+                }
+
+                override fun grantFail(error: String) {
+                    logger.e(error)
+                }
+            })
+        permission.grantPermissions()
+    }
+
 }

@@ -2,7 +2,11 @@ package com.example.broadcastation.control
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.broadcastation.entity.Remote
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+
 
 class Preference {
     /* **********************************************************************
@@ -28,11 +32,31 @@ class Preference {
     /* **********************************************************************
      * Admob
      ********************************************************************** */
-    fun addRemote(night: Boolean) {
+    fun saveRemote(remote: Remote) {
+        val gson = Gson()
+        val json = gson.toJson(remote)
+        var pastList = shared?.getString(addRemote, "")
+        if(!pastList.isNullOrEmpty()){
+            pastList += ","
+        }
         editor?.apply {
-            putBoolean(addRemote, night)
+            putString(addRemote, pastList + json)
             apply()
         }
+    }
+
+    fun getAll() : ArrayList<Remote>{
+        var listRemote: ArrayList<Remote> = arrayListOf()
+        val serializedObject: String? = shared?.getString(addRemote, null)
+        if (serializedObject != null) {
+            val gson = Gson()
+            val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
+            listRemote = gson.fromJson("[$serializedObject]", type) as ArrayList<Remote>
+        }
+        else{
+            return arrayListOf()
+        }
+        return listRemote
     }
 
     fun isAddRemote(): Boolean? {

@@ -1,5 +1,6 @@
 package com.example.broadcastation.presentation.add
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,7 +35,9 @@ import com.example.broadcastation.presentation.add.http.HttpFragment
 import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
+import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 import kotlin.math.log
 
 
@@ -50,7 +53,7 @@ class AddFragment :
     private lateinit var categoryAdapter: ArrayAdapter<String>
     private lateinit var optionAdapter: ArrayAdapter<String>
     private lateinit var pagerAdapter: ViewPagerAdapter
-    private var method: Int = 1
+    private var method: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
 
     companion object {
         fun newInstance(): AddFragment {
@@ -91,19 +94,51 @@ class AddFragment :
         logger.i("Handle dropdown menu ")
         val tabs = addViewModel.getTabs() ?: return
         val listRemote = resources.getStringArray(R.array.remote_menu)
-        val listCategoryRemote = resources.getStringArray(R.array.remote_category)
+        var listCategoryRemote = resources.getStringArray(R.array.remote_category).toMutableList()
         categoryAdapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_item,
             listCategoryRemote
         )
-        optionAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.dropdown_item,
-            listRemote
-        )
+        optionAdapter =
+            ArrayAdapter(
+                requireContext(),
+                R.layout.dropdown_item,
+                listRemote
+            )
         pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
         binding.categoryNameText.setAdapter(categoryAdapter)
+
+        binding.categoryNameText.setOnItemClickListener { adapterView, view, i, l ->
+            if (i == 0) {
+                val builder = AlertDialog.Builder(requireContext())
+                val inflater = layoutInflater
+                builder.setTitle("Thêm danh mục")
+                val dialogLayout = inflater.inflate(R.layout.layout_add_category, null)
+                val newCategory =
+                    dialogLayout.findViewById<TextInputEditText>(R.id.add_category_text)
+                builder.setView(dialogLayout)
+                builder.setPositiveButton("OK") { dialogInterface, i ->
+                    if (newCategory.text.isNullOrEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Danh mục không được để trống",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        listCategoryRemote.add(newCategory.text.toString())
+                        categoryAdapter.notifyDataSetChanged()
+                        Toast.makeText(
+                            requireContext(),
+                            newCategory.text.toString() + " đã được thêm vào danh mục",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+                builder.show()
+            }
+        }
+
         binding.optionNameText.setAdapter(optionAdapter)
         binding.optionNameText.setText(listRemote[0])
         binding.local.root.visibility = View.VISIBLE
@@ -168,21 +203,21 @@ class AddFragment :
                     binding.local.root.visibility = View.VISIBLE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.GONE
-                    method = 1
+                    method = ItemRemoteAdapter.Type.BLUETOOTH
                 }
 
                 listRemote[1] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.VISIBLE
                     binding.mqtt.root.visibility = View.GONE
-                    method = 2
+                    method = ItemRemoteAdapter.Type.HTTP
                 }
 
                 listRemote[2] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.VISIBLE
-                    method = 3
+                    method = ItemRemoteAdapter.Type.MQTT
                 }
             }
         }
@@ -192,21 +227,21 @@ class AddFragment :
                     binding.local.root.visibility = View.VISIBLE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.GONE
-                    method = 1
+                    method = ItemRemoteAdapter.Type.BLUETOOTH
                 }
 
                 1 -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.VISIBLE
                     binding.mqtt.root.visibility = View.GONE
-                    method = 2
+                    method = ItemRemoteAdapter.Type.HTTP
                 }
 
                 else -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.VISIBLE
-                    method = 3
+                    method = ItemRemoteAdapter.Type.MQTT
                 }
             }
         }
@@ -216,21 +251,22 @@ class AddFragment :
     /* **********************************************************************
      * Function
      ********************************************************************** */
-    private fun addRemote(name: String, describe: String, type: Int) {
+    private fun addRemote(name: String, describe: String, type: ItemRemoteAdapter.Type) {
         val icon = when (type) {
-            1 -> {
+            ItemRemoteAdapter.Type.BLUETOOTH -> {
                 R.drawable.ic_local
             }
 
-            2 -> {
+            ItemRemoteAdapter.Type.HTTP -> {
                 R.drawable.ic_http
             }
 
-            else -> {
+            ItemRemoteAdapter.Type.MQTT -> {
                 R.drawable.ic_mqtt
             }
         }
-        viewModel.addRemote(Remote(name, describe, type, icon))
+        val lastId = viewModel.remoteLiveList.value?.last()?.id ?: 0
+        viewModel.addRemote(Remote(lastId + 1, name, describe, type, icon))
     }
 
     private fun deleteRemote(name: String, describe: String, type: Int) {
@@ -247,7 +283,7 @@ class AddFragment :
                 R.drawable.ic_mqtt
             }
         }
-        viewModel.deleteRemote(Remote(name, describe, type, icon))
+//        viewModel.deleteRemote(Remote(name, describe, type, icon))
     }
 
     /* **********************************************************************

@@ -1,26 +1,21 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
-import com.google.android.material.snackbar.Snackbar
 
-class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load: View, private var activity: MainActivity) : RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(){
+class ItemRemoteAdapter(private var viewModel: MainViewModel, private var load: View) :
+    RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    private var data: MutableList<Remote> = mutableListOf<Remote>()
-    private var onItemTouchListener : ((Remote) -> Unit)? = null
+    private var data: MutableList<Remote> = mutableListOf()
+    private var onItemTouchListener: ((Remote) -> Unit)? = null
 
     /* **********************************************************************
     * Life Cycle
@@ -46,20 +41,17 @@ class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load:
             remoteIcon.setImageResource(item.icon)
             remoteContent.text = item.describe
         }
-        when (data[position].action) {
-            1 -> {
-                holder.binding.broadcast.setOnClickListener {
+        holder.binding.broadcast.setOnClickListener {
+            when (data[position].type) {
+                Type.BLUETOOTH -> {
                     viewModel.shareBluetooth(data[position], load)
-                    activity.grantPermission()
                 }
-            }
-            2 -> {
-                holder.binding.broadcast.setOnClickListener {
+
+                Type.HTTP -> {
                     viewModel.postHttp(data[position], load)
                 }
-            }
-            3 -> {
-                holder.binding.broadcast.setOnClickListener {
+
+                Type.MQTT -> {
                     viewModel.publishMqtt(data[position], load)
                 }
             }
@@ -68,13 +60,14 @@ class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load:
         holder.binding.root.setOnClickListener {
             onItemTouchListener?.let { it1 -> it1(data[position]) }
         }
+
     }
 
     /* **********************************************************************
     * Function
     ********************************************************************** */
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(data : MutableList<Remote>) {
+    fun setData(data: MutableList<Remote>) {
         this.data = data
         notifyDataSetChanged()
     }
@@ -88,5 +81,6 @@ class ItemRemoteAdapter( private var viewModel: MainViewModel, private var load:
     /* **********************************************************************
      * Class
      ********************************************************************** */
+    enum class Type { BLUETOOTH, HTTP, MQTT }
     class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
 }

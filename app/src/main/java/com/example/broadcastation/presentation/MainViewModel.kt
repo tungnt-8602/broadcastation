@@ -23,13 +23,13 @@ class MainViewModel : BaseViewModel(){
     val notice = MutableLiveData<String>()
     private val BASE_URL = "https://reqres.in/api/"
 
-    init {
-        remoteList.add(Remote("Home", "Bluetooth", 1, R.drawable.ic_local))
-        remoteList.add(Remote("TV", "Http", 2, R.drawable.ic_http))
-        remoteList.add(Remote("Mobile", "Bluetooth", 1, R.drawable.ic_local))
-        remoteList.add(Remote("Ipad", "Http", 2, R.drawable.ic_http))
-        remoteLiveList.postValue(remoteList)
-    }
+//    init {
+//        remoteList.add(Remote(1,"Home", "Bluetooth", 1, R.drawable.ic_local))
+//        remoteList.add(Remote(2,"TV", "Http", 2, R.drawable.ic_http))
+//        remoteList.add(Remote(3,"Mobile", "Bluetooth", 1, R.drawable.ic_local))
+//        remoteList.add(Remote(4,"Ipad", "Http", 2, R.drawable.ic_http))
+//        remoteLiveList.postValue(remoteList)
+//    }
     /* **********************************************************************
      * Function
      ********************************************************************** */
@@ -40,9 +40,12 @@ class MainViewModel : BaseViewModel(){
 
     fun addRemote(remote: Remote) {
         logger.i("added")
+        local.saveRemote(remote)
         remoteList.add(remote)
         remoteLiveList.postValue(remoteList)
     }
+
+    fun getAllRemote() = local.getAllRemote()
 
     fun deleteRemote(remote: Remote) {
         logger.i("added")

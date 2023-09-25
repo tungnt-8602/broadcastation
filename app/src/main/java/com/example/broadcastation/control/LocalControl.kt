@@ -3,6 +3,7 @@ package com.example.broadcastation.control
 import android.content.Context
 import android.preference.Preference
 import com.example.broadcastation.common.base.BaseControl
+import com.example.broadcastation.entity.Remote
 
 class LocalControl private constructor() : BaseControl() {
     /* **********************************************************************
@@ -32,8 +33,12 @@ class LocalControl private constructor() : BaseControl() {
     /* **********************************************************************
      * Notification before power outage
      ********************************************************************** */
-    fun addRemote(on: Boolean) {
-        preference.addRemote(on)
+    fun saveRemote(remote: Remote) {
+        preference.saveRemote(remote)
+    }
+
+    fun getAllRemote(): ArrayList<Remote>{
+        return preference.getAll()
     }
 
     fun isAddRemote(): Boolean {

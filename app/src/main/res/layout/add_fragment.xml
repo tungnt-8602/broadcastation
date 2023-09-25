@@ -9,7 +9,7 @@
         android:id="@+id/add_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/scc_100"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -49,7 +49,7 @@
         android:id="@+id/remote_common"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/space"
+        android:layout_marginBottom="@dimen/space"
         android:background="@color/white"
         android:paddingBottom="@dimen/space_large"
         app:layout_constraintTop_toBottomOf="@id/add_bar">
@@ -136,7 +136,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_large"
-            android:paddingBottom="@dimen/space"
             app:endIconTint="@color/scc_800"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -148,7 +147,6 @@
                 android:id="@+id/option_name_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:focusable="false"
                 android:hint="@string/remote_option"
                 android:labelFor="@id/option_remote" />
         </com.google.android.material.textfield.TextInputLayout>

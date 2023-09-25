@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.getData(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.statusBarColor = getColor(R.color.transparent)
+        window.statusBarColor = getColor(R.color.scc_100)
 
         logger.i("Add HomeFragment")
         val fragmentManager = supportFragmentManager

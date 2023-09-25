@@ -30,6 +30,7 @@
     <string name="remote_category">Danh mục <font color="#e53001">*</font></string>
     <string name="remote_option">Phương thức phát <font color="#e53001">*</font></string>
     <string name="delete">Xóa</string>
+    <string name="add_category">Nhập danh mục mới</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>
@@ -38,11 +39,8 @@
     </string-array>
 
     <string-array name="remote_category">
+        <item>Thêm mới</item>
         <item>Nhà riêng</item>
         <item>Cơ quan</item>
-        <item>Quê nội</item>
-        <item>Quê ngoại</item>
-        <item>Trường đại học</item>
-        <item>Khách sạn</item>
     </string-array>
 </resources>

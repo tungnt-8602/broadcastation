@@ -17,7 +17,6 @@ class AddViewModel : BaseViewModel() {
     private var tabs: List<Tab>? = null
     val uuid = MutableLiveData<String>()
 
-
     init {
         tabs = listOf(
             Tab(

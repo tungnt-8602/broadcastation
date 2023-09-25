@@ -1,5 +1,6 @@
 package com.example.broadcastation.presentation.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -20,9 +21,8 @@ import com.example.broadcastation.common.utility.ICON_REQUEST_KEY
 import com.example.broadcastation.common.utility.NAME_ARG
 import com.example.broadcastation.common.utility.NAME_REQUEST_KEY
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
-import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.HomeFragmentBinding
-import com.example.broadcastation.presentation.MainActivity
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
 import com.google.android.material.snackbar.Snackbar
@@ -45,6 +45,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
      * Life Cycle
      ********************************************************************** */
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isAdded) {
@@ -52,15 +53,21 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
         }
         fragmentManager = activity?.supportFragmentManager
 
+        val remoteList = viewModel.getAllRemote()
+        if(remoteList.isNullOrEmpty() || remoteList.size == 0) {
+            binding.empty.visibility = View.VISIBLE
+            binding.remoteList.visibility = View.GONE
+        }else{
+            binding.empty.visibility = View.GONE
+            binding.remoteList.visibility = View.VISIBLE
+        }
+
         logger.i("Recycler view")
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val adapter = ItemRemoteAdapter(viewModel, binding.idLoadingPB, (activity as MainActivity))
-        viewModel.remoteLiveList.observe(viewLifecycleOwner) { remotes ->
-            logger.i("list: $remotes")
-            adapter.setData(remotes)
-            binding.remoteList.adapter = adapter
-        }
+        val adapter = ItemRemoteAdapter(viewModel, binding.idLoadingPB)
+        adapter.setData(viewModel.getAllRemote() as MutableList<Remote>)
+        binding.remoteList.adapter = adapter
 
         logger.i("Item navigate: Update remote")
         adapter.setOnItemTouchListener {
@@ -97,7 +104,7 @@ class HomeFragment : BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::infl
             }
         }
 
-        logger.i("Message after action")
+        logger.i("Message after type")
         viewModel.notice.observe(viewLifecycleOwner) { message ->
             logger.d(message)
             Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).setAnchorView(binding.add)

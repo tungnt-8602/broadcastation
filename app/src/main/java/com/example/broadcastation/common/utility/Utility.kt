@@ -1,8 +1,11 @@
 package com.example.broadcastation.common.utility
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.provider.Settings
+import android.text.Layout
+import android.view.View
 
 const val NAME_REQUEST_KEY = "requestName"
 const val DESC_REQUEST_KEY = "requestDes"
@@ -26,3 +29,4 @@ fun Context.getUUID(): String {
         contentResolver, Settings.Secure.ANDROID_ID
     )
 }
+

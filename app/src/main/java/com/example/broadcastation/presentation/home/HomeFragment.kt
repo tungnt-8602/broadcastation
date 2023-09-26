@@ -111,7 +111,7 @@ class HomeFragment(val callback: Callback) : BaseFragment<HomeFragmentBinding>(H
      * Class
      ********************************************************************** */
     abstract class Callback : AddFragment.Callback {
-         abstract fun getAllRemote() : ArrayList<Remote>
+         abstract fun getAllRemote() : MutableList<Remote>
          abstract fun updateNotice(owner: LifecycleOwner, view: View)
          abstract fun grantBluetoothPermission()
     }

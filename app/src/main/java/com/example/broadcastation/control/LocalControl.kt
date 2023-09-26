@@ -36,7 +36,11 @@ class LocalControl private constructor() : BaseControl() {
         preference.saveRemote(remote)
     }
 
-    fun getAllRemote(): ArrayList<Remote>{
+    fun saveAllRemote(remotes: MutableList<Remote>) {
+        preference.updateAllRemotes(remotes)
+    }
+
+    fun getAllRemote(): MutableList<Remote>{
         return preference.getAllRemotes()
     }
 

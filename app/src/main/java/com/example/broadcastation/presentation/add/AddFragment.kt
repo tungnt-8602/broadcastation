@@ -39,10 +39,13 @@ import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 import com.google.android.material.textfield.TextInputEditText
+import com.google.gson.Gson
+import kotlin.math.log
 
 
 class AddFragment(private val callback: HomeFragment.Callback) :
-    BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {/* **********************************************************************
+    BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {
+    /* **********************************************************************
      * Variable
      ********************************************************************** */
 
@@ -140,7 +143,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         logger.i("Receive data from Home")
         setFragmentResultListener(ID_REQUEST_KEY) { key, bundle ->
             val id = bundle.getInt(ID_ARG)
-            remoteUpdate = viewModel.getAllRemote().toMutableList().find { it.id == id }!!
+            remoteUpdate = viewModel.getAllRemote().find { it.id == id }!!
             binding.remoteNameText.setText(remoteUpdate.name)
             binding.remoteDescriptionText.setText(remoteUpdate.describe)
             when (remoteUpdate.type) {
@@ -206,7 +209,16 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
         else if (viewModel.getEditRemote() == TAG_UPDATE_FRAGMENT) {
             viewModel.notice.value = MES_UPDATE_SUCCESS
-
+            val oldRemoteList = viewModel.getAllRemote()
+            oldRemoteList.forEach {
+                if(it.id == remoteUpdate.id){
+                    it.name = name
+                    it.describe = describe
+                    it.type = type
+                    it.icon = icon
+                }
+            }
+            callback.updateRemote(oldRemoteList)
         }
     }
 
@@ -236,5 +248,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
 
     interface Callback {
         fun addRemote(remote: Remote)
+        fun updateRemote(remotes: MutableList<Remote>)
     }
 }

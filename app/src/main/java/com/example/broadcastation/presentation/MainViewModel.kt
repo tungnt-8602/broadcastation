@@ -40,6 +40,11 @@ class MainViewModel : BaseViewModel(){
         remoteLiveList.postValue(remoteList)
     }
 
+    fun savAllRemote(remotes: MutableList<Remote>) {
+        logger.i("added")
+        local.saveAllRemote(remotes)
+    }
+
     fun getAllRemote() = local.getAllRemote()
 
     fun postHttp(remote: Remote, loadView: View){

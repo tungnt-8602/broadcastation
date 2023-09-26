@@ -2,6 +2,7 @@ package com.example.broadcastation.control
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.entity.Remote
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -16,6 +17,7 @@ class Preference {
     private val addRemote = "$preferenceName:addRemote"
     private val updateRemote = "$preferenceName:updateRemote"
     private val editRemote = "$preferenceName:editRemote"
+    private val logger  = Logger()
 
     private var shared: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -45,16 +47,26 @@ class Preference {
         }
     }
 
-    fun getAllRemotes() : ArrayList<Remote>{
-        var listRemote: ArrayList<Remote> = arrayListOf()
+    fun updateAllRemotes(remotes: MutableList<Remote>) {
+        val gson = Gson()
+        val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
+        val json = gson.toJson(remotes, type)
+        editor?.apply {
+            putString(addRemote, json.replace("[","").replace("]",""))
+            apply()
+        }
+    }
+
+    fun getAllRemotes() : MutableList<Remote>{
+        var listRemote: MutableList<Remote> = mutableListOf()
         val serializedObject: String? = shared?.getString(addRemote, null)
         if (serializedObject != null) {
             val gson = Gson()
             val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
-            listRemote = gson.fromJson("$serializedObject", type) as ArrayList<Remote>
+            listRemote = gson.fromJson("[$serializedObject]", type) as MutableList<Remote>
         }
         else{
-            return arrayListOf()
+            return mutableListOf()
         }
         return listRemote
     }

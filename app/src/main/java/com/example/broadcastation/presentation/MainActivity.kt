@@ -38,7 +38,8 @@ class MainActivity : AppCompatActivity() {
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
         transaction.add(R.id.mainContainer, HomeFragment(callback = object : HomeFragment.Callback() {
-            override fun getAllRemote(): ArrayList<Remote> {
+            override fun getAllRemote(): MutableList<Remote> {
+                logger.i("mutable : ${viewModel.getAllRemote()}")
                 return viewModel.getAllRemote()
             }
 
@@ -57,6 +58,10 @@ class MainActivity : AppCompatActivity() {
             override fun addRemote(remote: Remote) {
 //                viewModel.notice.value = MES_ADD_SUCCESS
                 viewModel.addRemote(remote)
+            }
+
+            override fun updateRemote(remotes: MutableList<Remote>) {
+                viewModel.savAllRemote(remotes)
             }
 
         }), "home")

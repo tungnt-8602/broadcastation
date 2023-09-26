@@ -7,9 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.presentation.MainViewModel
 
-class ItemRemoteAdapter(private var viewModel: MainViewModel, private var load: View) :
+class ItemRemoteAdapter(var callback: Callback, val view: View) :
     RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
     /* **********************************************************************
      * Variable
@@ -44,15 +43,15 @@ class ItemRemoteAdapter(private var viewModel: MainViewModel, private var load: 
         holder.binding.broadcast.setOnClickListener {
             when (data[position].type) {
                 Type.BLUETOOTH -> {
-                    viewModel.shareBluetooth(data[position], load)
+                    callback.shareBluetooth(data[position], view)
                 }
 
                 Type.HTTP -> {
-                    viewModel.postHttp(data[position], load)
+                    callback.postHttp(data[position], view)
                 }
 
                 Type.MQTT -> {
-                    viewModel.publishMqtt(data[position], load)
+                    callback.publishMqtt(data[position], view)
                 }
             }
         }
@@ -83,4 +82,10 @@ class ItemRemoteAdapter(private var viewModel: MainViewModel, private var load: 
      ********************************************************************** */
     enum class Type { BLUETOOTH, HTTP, MQTT }
     class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
+    interface Callback{
+        fun shareBluetooth(remote: Remote, view: View)
+        fun postHttp(remote: Remote, view: View)
+        fun publishMqtt(remote: Remote, view: View)
+
+    }
 }

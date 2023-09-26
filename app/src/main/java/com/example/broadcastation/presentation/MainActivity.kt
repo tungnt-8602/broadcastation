@@ -2,14 +2,17 @@ package com.example.broadcastation.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.LifecycleOwner
 import com.example.broadcastation.R
 import com.example.broadcastation.common.logger.Logger
+import com.example.broadcastation.common.utility.MES_ADD_SUCCESS
 import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.ActivityMainBinding
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.home.HomeFragment
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
     /* **********************************************************************
@@ -34,7 +37,29 @@ class MainActivity : AppCompatActivity() {
         logger.i("Add HomeFragment")
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
-        transaction.add(R.id.mainContainer, HomeFragment(), "home")
+        transaction.add(R.id.mainContainer, HomeFragment(callback = object : HomeFragment.Callback() {
+            override fun getAllRemote(): ArrayList<Remote> {
+                return viewModel.getAllRemote()
+            }
+
+            override fun updateNotice(owner: LifecycleOwner, view: View) {
+                viewModel.notice.observe(owner) { message ->
+                    logger.d(message)
+                    Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).setAnchorView(view)
+                        .show()
+                }
+            }
+
+            override fun grantBluetoothPermission() {
+                grantPermission()
+            }
+
+            override fun addRemote(remote: Remote) {
+//                viewModel.notice.value = MES_ADD_SUCCESS
+                viewModel.addRemote(remote)
+            }
+
+        }), "home")
             .addToBackStack(null)
             .commit()
     }
@@ -42,10 +67,10 @@ class MainActivity : AppCompatActivity() {
     /* **********************************************************************
      * Function
      ********************************************************************** */
-     fun grantPermission() {
+     fun grantPermission(){
         permission.registerCallback(MainActivity::class.java.name,
             object : PermissionControl.PermissionCallback {
-                override fun grantSuccess() {
+                override fun grantSuccess(){
                     permission.turnOnBluetooth()
                 }
 
@@ -55,5 +80,8 @@ class MainActivity : AppCompatActivity() {
             })
         permission.grantPermissions()
     }
+    /* **********************************************************************
+     * Class
+     ********************************************************************** */
 
 }

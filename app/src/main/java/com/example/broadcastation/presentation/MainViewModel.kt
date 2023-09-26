@@ -5,6 +5,9 @@ import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
+import com.example.broadcastation.common.utility.BASE_URL
+import com.example.broadcastation.common.utility.EMPTY
+import com.example.broadcastation.common.utility.ERROR
 import com.example.broadcastation.common.utility.getUUID
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.RetrofitAPI
@@ -21,15 +24,7 @@ class MainViewModel : BaseViewModel(){
     var remoteLiveList = MutableLiveData<MutableList<Remote>>()
     private var remoteList = mutableListOf<Remote>()
     val notice = MutableLiveData<String>()
-    private val BASE_URL = "https://reqres.in/api/"
 
-//    init {
-//        remoteList.add(Remote(1,"Home", "Bluetooth", 1, R.drawable.ic_local))
-//        remoteList.add(Remote(2,"TV", "Http", 2, R.drawable.ic_http))
-//        remoteList.add(Remote(3,"Mobile", "Bluetooth", 1, R.drawable.ic_local))
-//        remoteList.add(Remote(4,"Ipad", "Http", 2, R.drawable.ic_http))
-//        remoteLiveList.postValue(remoteList)
-//    }
     /* **********************************************************************
      * Function
      ********************************************************************** */
@@ -47,12 +42,6 @@ class MainViewModel : BaseViewModel(){
 
     fun getAllRemote() = local.getAllRemote()
 
-    fun deleteRemote(remote: Remote) {
-        logger.i("added")
-        remoteList.remove(remote)
-        remoteLiveList.postValue(remoteList)
-    }
-
     fun postHttp(remote: Remote, loadView: View){
         loadView.visibility = View.VISIBLE
         val retrofit = Retrofit.Builder()
@@ -64,12 +53,12 @@ class MainViewModel : BaseViewModel(){
         call!!.enqueue(object : Callback<Remote?> {
             override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
                 loadView.visibility = View.GONE
-                notice.value = response.body()?.describe ?: "Nothing to show"
+                notice.value = response.body()?.describe ?: EMPTY
             }
 
             override fun onFailure(call: Call<Remote?>, t: Throwable) {
                 loadView.visibility = View.GONE
-                notice.value = "Error found is : " + t.message
+                notice.value = ERROR + t.message
             }
         })
     }
@@ -82,9 +71,9 @@ class MainViewModel : BaseViewModel(){
         notice.value = "Mqtt broadcast: ${remote.name}"
     }
 
-    fun isEditRemote(): Boolean = local.isEditRemote()
+    fun getEditRemote(): String = local.getEditRemote()
 
-    fun editRemote(edit: Boolean) = local.editRemote(edit)
+    fun editRemote(edit: String) = local.editRemote(edit)
 
     /* **********************************************************************
     * Class

@@ -2,14 +2,10 @@ package com.example.broadcastation.presentation.add
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -24,10 +20,16 @@ import com.example.broadcastation.common.utility.DESC_ARG
 import com.example.broadcastation.common.utility.DESC_REQUEST_KEY
 import com.example.broadcastation.common.utility.ICON_ARG
 import com.example.broadcastation.common.utility.ICON_REQUEST_KEY
+import com.example.broadcastation.common.utility.ID_ARG
+import com.example.broadcastation.common.utility.ID_REQUEST_KEY
+import com.example.broadcastation.common.utility.MES_ADD_SUCCESS
 import com.example.broadcastation.common.utility.MES_UPDATE_SUCCESS
 import com.example.broadcastation.common.utility.NAME_ARG
 import com.example.broadcastation.common.utility.NAME_REQUEST_KEY
+import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_HOME_FRAGMENT
+import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
+import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.databinding.AddFragmentBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainViewModel
@@ -36,30 +38,19 @@ import com.example.broadcastation.presentation.add.local.LocalFragment
 import com.example.broadcastation.presentation.add.mqtt.MqttFragment
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
-import kotlin.math.log
 
 
-class AddFragment :
-    BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {
-    /* **********************************************************************
+class AddFragment(private val callback: HomeFragment.Callback) :
+    BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {/* **********************************************************************
      * Variable
      ********************************************************************** */
 
     private var fragmentManager: FragmentManager? = null
     private val addViewModel: AddViewModel by viewModels()
     private val viewModel: MainViewModel by activityViewModels()
-    private lateinit var categoryAdapter: ArrayAdapter<String>
-    private lateinit var optionAdapter: ArrayAdapter<String>
-    private lateinit var pagerAdapter: ViewPagerAdapter
-    private var method: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
-
-    companion object {
-        fun newInstance(): AddFragment {
-            return AddFragment()
-        }
-    }
+    private var typeBroadcast: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
+    private lateinit var remoteUpdate : Remote
 
     /* **********************************************************************
      * Life Cycle
@@ -74,41 +65,21 @@ class AddFragment :
 
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
-            fragmentManager?.commit {
-                setCustomAnimations(
-                    R.anim.fade_in,
-                    R.anim.slide_out,
-                    R.anim.slide_in,
-                    R.anim.fade_out
-                )
-                replace(
-                    R.id.mainContainer,
-                    fragmentManager?.findFragmentByTag("home") ?: HomeFragment.newInstance(),
-                    null
-                )
-                addToBackStack(null)
-                setReorderingAllowed(true)
-            }
+            screenNavigate(
+                fragmentManager, R.id.mainContainer, fragmentManager?.findFragmentByTag(
+                    TAG_HOME_FRAGMENT
+                ) ?: HomeFragment(callback)
+            )
         }
 
         logger.i("Handle dropdown menu ")
-        val tabs = addViewModel.getTabs() ?: return
         val listRemote = resources.getStringArray(R.array.remote_menu)
-        var listCategoryRemote = resources.getStringArray(R.array.remote_category).toMutableList()
-        categoryAdapter = ArrayAdapter(
-            requireContext(),
-            R.layout.dropdown_item,
-            listCategoryRemote
-        )
-        optionAdapter =
-            ArrayAdapter(
-                requireContext(),
-                R.layout.dropdown_item,
-                listRemote
-            )
-        pagerAdapter = ViewPagerAdapter(tabs, requireActivity())
-        binding.categoryNameText.setAdapter(categoryAdapter)
+        val listCategoryRemote = resources.getStringArray(R.array.remote_category).toMutableList()
+        val categoryAdapter =
+            ArrayAdapter(requireContext(), R.layout.dropdown_item, listCategoryRemote)
+        val optionAdapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, listRemote)
 
+        binding.categoryNameText.setAdapter(categoryAdapter)
         binding.categoryNameText.setOnItemClickListener { adapterView, view, i, l ->
             if (i == 0) {
                 val builder = AlertDialog.Builder(requireContext())
@@ -121,9 +92,7 @@ class AddFragment :
                 builder.setPositiveButton("OK") { dialogInterface, i ->
                     if (newCategory.text.isNullOrEmpty()) {
                         Toast.makeText(
-                            requireContext(),
-                            "Danh mục không được để trống",
-                            Toast.LENGTH_SHORT
+                            requireContext(), "Danh mục không được để trống", Toast.LENGTH_SHORT
                         ).show()
                     } else {
                         listCategoryRemote.add(newCategory.text.toString())
@@ -139,151 +108,106 @@ class AddFragment :
             }
         }
 
-        binding.optionNameText.setAdapter(optionAdapter)
-        binding.optionNameText.setText(listRemote[0])
-        binding.local.root.visibility = View.VISIBLE
-        binding.http.root.visibility = View.GONE
-        binding.mqtt.root.visibility = View.GONE
+        val tabs = addViewModel.getTabs() ?: return
 
-        logger.i("Receive data from Home")
-        setFragmentResultListener(NAME_REQUEST_KEY) { key, bundle ->
-            val name = bundle.getString(NAME_ARG)
-            binding.remoteNameText.setText(name)
-        }
-        setFragmentResultListener(DESC_REQUEST_KEY) { key, bundle ->
-            val des = bundle.getString(DESC_ARG)
-            binding.remoteDescriptionText.setText(des)
-        }
-        setFragmentResultListener(ICON_REQUEST_KEY) { key, bundle ->
-            when (bundle.getInt(ICON_ARG)) {
-                R.drawable.ic_local -> {
-                    binding.optionNameText.setText(listRemote[0])
-                }
-
-                R.drawable.ic_http -> {
-                    binding.optionNameText.setText(listRemote[1])
-                }
-
-                else -> {
-                    binding.optionNameText.setText(listRemote[2])
-                }
-            }
-        }
-
-        logger.i("Navigate to home")
-        binding.saveRemote.setOnClickListener {
-            viewModel.notice.value = MES_UPDATE_SUCCESS
-            addRemote(
-                binding.remoteNameText.text.toString(),
-                binding.remoteDescriptionText.text.toString(),
-                method
-            )
-            fragmentManager?.commit {
-                setCustomAnimations(
-                    R.anim.fade_in,
-                    R.anim.slide_out,
-                    R.anim.slide_in,
-                    R.anim.fade_out
-                )
-                replace(
-                    R.id.mainContainer,
-                    fragmentManager?.findFragmentByTag(TAG_HOME_FRAGMENT)
-                        ?: HomeFragment.newInstance(),
-                    null
-                )
-                addToBackStack(null)
-                setReorderingAllowed(true)
-            }
-        }
-
-        logger.i("Handle option of remote by method")
+        logger.i("Handle option of remote by typeBroadcast")
         binding.optionNameText.doAfterTextChanged {
             when (it.toString()) {
                 listRemote[0] -> {
                     binding.local.root.visibility = View.VISIBLE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.GONE
-                    method = ItemRemoteAdapter.Type.BLUETOOTH
+                    typeBroadcast = ItemRemoteAdapter.Type.BLUETOOTH
                 }
 
                 listRemote[1] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.VISIBLE
                     binding.mqtt.root.visibility = View.GONE
-                    method = ItemRemoteAdapter.Type.HTTP
+                    typeBroadcast = ItemRemoteAdapter.Type.HTTP
                 }
 
                 listRemote[2] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.VISIBLE
-                    method = ItemRemoteAdapter.Type.MQTT
+                    typeBroadcast = ItemRemoteAdapter.Type.MQTT
                 }
             }
         }
-        binding.optionNameText.setOnItemClickListener { adapterView, view, i, l ->
-            when (i) {
-                0 -> {
-                    binding.local.root.visibility = View.VISIBLE
-                    binding.http.root.visibility = View.GONE
-                    binding.mqtt.root.visibility = View.GONE
-                    method = ItemRemoteAdapter.Type.BLUETOOTH
+        binding.optionNameText.setAdapter(optionAdapter)
+
+        logger.i("Receive data from Home")
+        setFragmentResultListener(ID_REQUEST_KEY) { key, bundle ->
+            val id = bundle.getInt(ID_ARG)
+            remoteUpdate = viewModel.getAllRemote().toMutableList().find { it.id == id }!!
+            binding.remoteNameText.setText(remoteUpdate.name)
+            binding.remoteDescriptionText.setText(remoteUpdate.describe)
+            when (remoteUpdate.type) {
+                ItemRemoteAdapter.Type.BLUETOOTH -> {
+                    binding.optionNameText.setText(listRemote[0])
                 }
 
-                1 -> {
-                    binding.local.root.visibility = View.GONE
-                    binding.http.root.visibility = View.VISIBLE
-                    binding.mqtt.root.visibility = View.GONE
-                    method = ItemRemoteAdapter.Type.HTTP
+                ItemRemoteAdapter.Type.HTTP -> {
+                    binding.optionNameText.setText(listRemote[1])
+                }
+
+                ItemRemoteAdapter.Type.MQTT -> {
+                    binding.optionNameText.setText(listRemote[2])
                 }
 
                 else -> {
-                    binding.local.root.visibility = View.GONE
-                    binding.http.root.visibility = View.GONE
-                    binding.mqtt.root.visibility = View.VISIBLE
-                    method = ItemRemoteAdapter.Type.MQTT
+                    binding.optionNameText.setText(listRemote[0])
                 }
             }
         }
 
+        logger.i("Navigate to home")
+        binding.saveRemote.setOnClickListener {
+            saveInputAsRemote(
+                binding.remoteNameText.text.toString(),
+                binding.remoteDescriptionText.text.toString(),
+                typeBroadcast
+            )
+            screenNavigate(
+                fragmentManager,
+                R.id.mainContainer,
+                fragmentManager?.findFragmentByTag(TAG_HOME_FRAGMENT) ?: HomeFragment(callback)
+            )
+
+        }
     }
 
-    /* **********************************************************************
+    /* ***********************************************************************
      * Function
      ********************************************************************** */
-    private fun addRemote(name: String, describe: String, type: ItemRemoteAdapter.Type) {
+    private fun saveInputAsRemote(name: String, describe: String, type: ItemRemoteAdapter.Type) {
         val icon = when (type) {
-            ItemRemoteAdapter.Type.BLUETOOTH -> {
-                R.drawable.ic_local
-            }
-
             ItemRemoteAdapter.Type.HTTP -> {
                 R.drawable.ic_http
+            }
+
+            ItemRemoteAdapter.Type.BLUETOOTH -> {
+                R.drawable.ic_local
             }
 
             ItemRemoteAdapter.Type.MQTT -> {
                 R.drawable.ic_mqtt
             }
         }
-        val lastId = viewModel.remoteLiveList.value?.last()?.id ?: 0
-        viewModel.addRemote(Remote(lastId + 1, name, describe, type, icon))
-    }
-
-    private fun deleteRemote(name: String, describe: String, type: Int) {
-        val icon = when (type) {
-            1 -> {
-                R.drawable.ic_local
+        if(viewModel.getEditRemote() == TAG_ADD_FRAGMENT) {
+            viewModel.notice.value = MES_ADD_SUCCESS
+            var lastId = 1
+            val remoteArray = callback.getAllRemote()
+            if (remoteArray.isNotEmpty()) {
+                lastId += remoteArray.last().id
             }
-
-            2 -> {
-                R.drawable.ic_http
-            }
-
-            else -> {
-                R.drawable.ic_mqtt
-            }
+            callback.addRemote(Remote(lastId, name, describe, type, icon))
         }
-//        viewModel.deleteRemote(Remote(name, describe, type, icon))
+        else if (viewModel.getEditRemote() == TAG_UPDATE_FRAGMENT) {
+            viewModel.notice.value = MES_UPDATE_SUCCESS
+
+        }
     }
 
     /* **********************************************************************
@@ -308,5 +232,9 @@ class AddFragment :
             }
             return fragment
         }
+    }
+
+    interface Callback {
+        fun addRemote(remote: Remote)
     }
 }

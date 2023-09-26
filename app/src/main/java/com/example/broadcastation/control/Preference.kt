@@ -45,13 +45,13 @@ class Preference {
         }
     }
 
-    fun getAll() : ArrayList<Remote>{
+    fun getAllRemotes() : ArrayList<Remote>{
         var listRemote: ArrayList<Remote> = arrayListOf()
         val serializedObject: String? = shared?.getString(addRemote, null)
         if (serializedObject != null) {
             val gson = Gson()
             val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
-            listRemote = gson.fromJson("[$serializedObject]", type) as ArrayList<Remote>
+            listRemote = gson.fromJson("$serializedObject", type) as ArrayList<Remote>
         }
         else{
             return arrayListOf()
@@ -59,29 +59,14 @@ class Preference {
         return listRemote
     }
 
-    fun isAddRemote(): Boolean? {
-        return shared?.getBoolean(addRemote, false)
-    }
-
-    fun updateRemote(night: Boolean) {
+    fun editRemote(edit: String) {
         editor?.apply {
-            putBoolean(updateRemote, night)
+            putString(editRemote, edit)
             apply()
         }
     }
 
-    fun isUpdateRemote(): Boolean? {
-        return shared?.getBoolean(updateRemote, false)
-    }
-
-    fun editRemote(edit: Boolean) {
-        editor?.apply {
-            putBoolean(editRemote, edit)
-            apply()
-        }
-    }
-
-    fun isEditRemote(): Boolean? {
-        return shared?.getBoolean(editRemote, false)
+    fun isEditRemote(): String? {
+        return shared?.getString(editRemote, "")
     }
 }

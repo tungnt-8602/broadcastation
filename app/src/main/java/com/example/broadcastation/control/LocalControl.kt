@@ -1,7 +1,6 @@
 package com.example.broadcastation.control
 
 import android.content.Context
-import android.preference.Preference
 import com.example.broadcastation.common.base.BaseControl
 import com.example.broadcastation.entity.Remote
 
@@ -38,27 +37,15 @@ class LocalControl private constructor() : BaseControl() {
     }
 
     fun getAllRemote(): ArrayList<Remote>{
-        return preference.getAll()
+        return preference.getAllRemotes()
     }
 
-    fun isAddRemote(): Boolean {
-        return preference.isAddRemote() ?: false
+    fun editRemote(method: String) {
+        preference.editRemote(method)
     }
 
-    fun updateRemote(on: Boolean) {
-        preference.updateRemote(on)
-    }
-
-    fun isUpdateRemote(): Boolean {
-        return preference.isUpdateRemote() ?: false
-    }
-
-    fun editRemote(on: Boolean) {
-        preference.editRemote(on)
-    }
-
-    fun isEditRemote(): Boolean {
-        return preference.isEditRemote() ?: false
+    fun getEditRemote(): String {
+        return preference.isEditRemote() ?: ""
     }
 
 }

@@ -53,13 +53,14 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
             }
         }
 
-    fun turnOnBluetooth() {
+    fun turnOnBluetooth(): Boolean {
         val bluetoothManager = activity.getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter = bluetoothManager.adapter
         if (bluetoothAdapter != null && !bluetoothAdapter.isEnabled) {
             val intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             requestOnOffBluetooth.launch(intent)
         }
+        return bluetoothAdapter.isEnabled
     }
 
     fun openSettingPermission() {
@@ -133,6 +134,7 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 logger.i("Granted : ACTION_REQUEST_ENABLE")
+                callbackCall(CallbackAction.SUCCESS, "${result.resultCode}")
             } else {
                 logger.i("Denied : ACTION_REQUEST_ENABLE")
                 callbackCall(CallbackAction.FAIL, "${result.resultCode}")

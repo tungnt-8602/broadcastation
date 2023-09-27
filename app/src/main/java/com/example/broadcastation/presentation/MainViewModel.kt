@@ -1,9 +1,7 @@
 package com.example.broadcastation.presentation
 
 import android.content.Context
-import android.view.View
 import androidx.lifecycle.MutableLiveData
-import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.BASE_URL
 import com.example.broadcastation.common.utility.EMPTY
@@ -17,38 +15,33 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class MainViewModel : BaseViewModel(){
+class MainViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    var remoteLiveList = MutableLiveData<MutableList<Remote>>()
-    private var remoteList = mutableListOf<Remote>()
     val notice = MutableLiveData<String>()
 
     /* **********************************************************************
      * Function
      ********************************************************************** */
 
-    fun getData(context: Context){
+    fun getData(context: Context) {
         storage.deviceId = context.getUUID()
     }
 
     fun addRemote(remote: Remote) {
         logger.i("added")
         local.saveRemote(remote)
-        remoteList.add(remote)
-        remoteLiveList.postValue(remoteList)
     }
 
-    fun savAllRemote(remotes: MutableList<Remote>) {
+    fun saveAllRemote(remotes: MutableList<Remote>) {
         logger.i("added")
         local.saveAllRemote(remotes)
     }
 
     fun getAllRemote() = local.getAllRemote()
 
-    fun postHttp(remote: Remote, loadView: View){
-        loadView.visibility = View.VISIBLE
+    fun postHttp(remote: Remote){
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
@@ -57,28 +50,34 @@ class MainViewModel : BaseViewModel(){
         val call: Call<Remote?>? = retrofitAPI.postRemoteContent(remote)
         call!!.enqueue(object : Callback<Remote?> {
             override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
-                loadView.visibility = View.GONE
-                notice.value = response.body()?.describe ?: EMPTY
+                local.saveMessageBroadcast(response.body()?.describe ?: EMPTY)
             }
 
             override fun onFailure(call: Call<Remote?>, t: Throwable) {
-                loadView.visibility = View.GONE
-                notice.value = ERROR + t.message
+                local.saveMessageBroadcast(ERROR + t.message)
             }
         })
     }
 
-    fun shareBluetooth(remote: Remote, loadView: View){
-        notice.value = "Bluetooth broadcast: ${remote.name}"
+    fun shareBluetooth(remote: Remote) {
+        logger.i("Bluetooth broadcast: ${remote.name}")
     }
 
-    fun publishMqtt(remote: Remote, loadView: View){
-        notice.value = "Mqtt broadcast: ${remote.name}"
+    fun publishMqtt(remote: Remote) {
+        logger.i("Mqtt broadcast: ${remote.name}")
     }
 
-    fun getEditRemote(): String = local.getEditRemote()
+    fun getActionRemote(): String = local.getActionRemote()
 
-    fun editRemote(edit: String) = local.editRemote(edit)
+    fun actionRemote(edit: String) = local.actionRemote(edit)
+
+    fun getMessageAction() :String = local.getMessageAction()
+
+    fun saveMessageAction(message: String) = local.saveMessageAction(message)
+
+    fun getMessageBroadcast() :String = local.getMessageBroadcast()
+
+    fun saveMessageBroadcast(message: String) = local.saveMessageBroadcast(message)
 
     /* **********************************************************************
     * Class

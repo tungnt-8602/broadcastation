@@ -40,16 +40,31 @@ class LocalControl private constructor() : BaseControl() {
         preference.updateAllRemotes(remotes)
     }
 
-    fun getAllRemote(): MutableList<Remote>{
+    fun getAllRemote(): MutableList<Remote> {
         return preference.getAllRemotes()
     }
 
-    fun editRemote(method: String) {
-        preference.editRemote(method)
+    fun actionRemote(action: String) {
+        preference.actionRemote(action)
     }
 
-    fun getEditRemote(): String {
-        return preference.isEditRemote() ?: ""
+    fun getActionRemote(): String {
+        return preference.getActionRemote() ?: ""
     }
 
+    fun getMessageAction(): String {
+        return preference.getMessageAction() ?: ""
+    }
+
+    fun saveMessageAction(message: String) {
+        preference.saveMessageAction(message)
+    }
+
+    fun getMessageBroadcast(): String {
+        return preference.getMessageBroadcast() ?: ""
+    }
+
+    fun saveMessageBroadcast(message: String) {
+        preference.saveMessageBroadcast(message)
+    }
 }

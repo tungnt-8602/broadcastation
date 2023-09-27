@@ -4,6 +4,7 @@
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/sound_cloud_color</item>
         <item name="colorPrimaryContainer">@color/scc_300</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
     </style>
 
     <style name="Theme.Broadcastation" parent="Base.Theme.Broadcastation" />

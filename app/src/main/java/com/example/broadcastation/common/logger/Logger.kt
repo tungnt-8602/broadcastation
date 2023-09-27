@@ -5,9 +5,9 @@ import com.example.broadcastation.BuildConfig
 import java.util.Calendar
 
 class Logger(
-    var isLogger: Boolean = true,
-    var tag: String? = Logger::class.simpleName,
-    var level: Type = Type.VERBOSE
+    private var isLogger: Boolean = true,
+    private var tag: String? = Logger::class.simpleName,
+    private var level: Type = Type.VERBOSE
 ) {
     /* **********************************************************************
      * Singleton

@@ -9,7 +9,7 @@
         android:id="@+id/add_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/scc_100"
+        android:background="@color/scc_300"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
@@ -29,6 +29,7 @@
             android:layout_height="wrap_content"
             android:text="@string/add_remote"
             android:textAlignment="center"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/backToHome"
             app:layout_constraintEnd_toStartOf="@id/endPadding"
             app:layout_constraintStart_toEndOf="@id/backToHome"
@@ -196,7 +197,9 @@
         android:layout_marginEnd="@dimen/space_large"
         android:layout_marginBottom="@dimen/space_large"
         android:text="@string/save"
+        android:textColor="@color/white"
         app:icon="@drawable/ic_save_remote"
+        app:iconTint="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

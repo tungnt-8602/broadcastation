@@ -7,29 +7,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import com.example.broadcastation.R
-import java.lang.Error
+import com.example.broadcastation.presentation.MainActivity
 
 const val ID_REQUEST_KEY = "requestId"
-const val NAME_REQUEST_KEY = "requestName"
-const val DESC_REQUEST_KEY = "requestDes"
-const val ICON_REQUEST_KEY = "requestIcon"
-const val EDIT_REQUEST_KEY = "requestEdit"
 const val ID_ARG = "id"
-const val NAME_ARG = "name"
-const val DESC_ARG = "des"
-const val ICON_ARG = "icon"
-const val EDIT_ARG = "edit"
-const val EDIT_TITLE = "Cập nhật điều khiển"
-
-const val MES_ADD_SUCCESS = "Add successfully"
-const val MES_UPDATE_SUCCESS = "Update successfully"
-const val EMPTY = "Nothing to show"
-const val ERROR = "Error found is : "
+const val EMPTY = "Không có gì"
+const val ERROR = "Lỗi: "
 
 const val TAG_HOME_FRAGMENT = "home"
 const val TAG_ADD_FRAGMENT = "add"
 const val TAG_UPDATE_FRAGMENT = "update"
 const val BASE_URL = "https://reqres.in/api/"
+
+const val FIRST_STACK = 1
+const val DELAY_TIME_TO_QUIT : Long = 2000
 
 @SuppressLint("HardwareIds")
 fun Context.getUUID(): String {
@@ -38,14 +29,23 @@ fun Context.getUUID(): String {
     )
 }
 
-fun screenNavigate(fragmentManager: FragmentManager?, containerView: Int, aimFragment: Fragment, tag: String? = null){
+fun screenNavigate(fragmentManager: FragmentManager?, navDirection: MainActivity.Navigate, containerView: Int, aimFragment: Fragment, tag: String? = null){
     fragmentManager?.commit {
-        setCustomAnimations(
-            R.anim.fade_in,
-            R.anim.slide_out,
-            R.anim.slide_in,
-            R.anim.fade_out
-        )
+        if (navDirection == MainActivity.Navigate.DOWN) {
+            setCustomAnimations(
+                R.anim.fade_in,
+                R.anim.slide_out,
+                R.anim.slide_in,
+                R.anim.fade_out
+            )
+        }else{
+            setCustomAnimations(
+                R.anim.slide_in,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.slide_out
+            )
+        }
         replace(
             containerView,
             aimFragment,

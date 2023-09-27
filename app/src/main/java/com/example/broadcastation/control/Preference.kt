@@ -2,7 +2,6 @@ package com.example.broadcastation.control
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.entity.Remote
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -15,9 +14,9 @@ class Preference {
      ********************************************************************** */
     private val preferenceName = "Preference"
     private val addRemote = "$preferenceName:addRemote"
-    private val updateRemote = "$preferenceName:updateRemote"
-    private val editRemote = "$preferenceName:editRemote"
-    private val logger  = Logger()
+    private val actionRemote = "$preferenceName:actionRemote"
+    private val messageAction = "$preferenceName:messageAction"
+    private val messageBroadcast = "$preferenceName:messageBroadcast"
 
     private var shared: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -58,7 +57,7 @@ class Preference {
     }
 
     fun getAllRemotes() : MutableList<Remote>{
-        var listRemote: MutableList<Remote> = mutableListOf()
+        val listRemote: MutableList<Remote>
         val serializedObject: String? = shared?.getString(addRemote, null)
         if (serializedObject != null) {
             val gson = Gson()
@@ -71,14 +70,36 @@ class Preference {
         return listRemote
     }
 
-    fun editRemote(edit: String) {
+    fun actionRemote(action: String) {
         editor?.apply {
-            putString(editRemote, edit)
+            putString(actionRemote, action)
             apply()
         }
     }
 
-    fun isEditRemote(): String? {
-        return shared?.getString(editRemote, "")
+    fun getActionRemote(): String? {
+        return shared?.getString(actionRemote, "")
+    }
+
+    fun getMessageAction(): String? {
+        return shared?.getString(messageAction, "")
+    }
+
+    fun saveMessageAction(message: String){
+        editor?.apply{
+            putString(messageAction, message)
+            apply()
+        }
+    }
+
+    fun getMessageBroadcast(): String? {
+        return shared?.getString(messageBroadcast, "")
+    }
+
+    fun saveMessageBroadcast(message: String){
+        editor?.apply{
+            putString(messageBroadcast, message)
+            apply()
+        }
     }
 }

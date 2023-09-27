@@ -2,13 +2,12 @@ package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
 
-class ItemRemoteAdapter(var callback: Callback, val view: View) :
+class ItemRemoteAdapter(var callback: Callback) :
     RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
     /* **********************************************************************
      * Variable
@@ -43,15 +42,15 @@ class ItemRemoteAdapter(var callback: Callback, val view: View) :
         holder.binding.broadcast.setOnClickListener {
             when (data[position].type) {
                 Type.BLUETOOTH -> {
-                    callback.shareBluetooth(data[position], view)
+                    callback.shareBluetooth(data[position])
                 }
 
                 Type.HTTP -> {
-                    callback.postHttp(data[position], view)
+                    callback.postHttp(data[position])
                 }
 
                 Type.MQTT -> {
-                    callback.publishMqtt(data[position], view)
+                    callback.publishMqtt(data[position])
                 }
             }
         }
@@ -82,10 +81,9 @@ class ItemRemoteAdapter(var callback: Callback, val view: View) :
      ********************************************************************** */
     enum class Type { BLUETOOTH, HTTP, MQTT }
     class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
-    interface Callback{
-        fun shareBluetooth(remote: Remote, view: View)
-        fun postHttp(remote: Remote, view: View)
-        fun publishMqtt(remote: Remote, view: View)
-
+    interface Callback {
+        fun shareBluetooth(remote: Remote)
+        fun postHttp(remote: Remote)
+        fun publishMqtt(remote: Remote)
     }
 }

@@ -12,17 +12,4 @@ import com.example.broadcastation.databinding.FragmentLocalBinding
 import com.example.broadcastation.presentation.add.AddViewModel
 
 class LocalFragment : BaseFragment<FragmentLocalBinding>(FragmentLocalBinding::inflate) {
-
-    private val viewModel: AddViewModel by viewModels()
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        logger.i("Get data uuid")
-        viewModel.bind()
-        logger.i("Paste uuid in edittext")
-        viewModel.uuid.observe(viewLifecycleOwner){
-            binding.deviceIdText.setText(it)
-        }
-
-    }
 }

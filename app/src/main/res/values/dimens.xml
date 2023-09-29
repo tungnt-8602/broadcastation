@@ -9,8 +9,9 @@
     <dimen name="space_larges">18dp</dimen>
     <dimen name="space_larger">24dp</dimen>
     <dimen name="space_super">32dp</dimen>
-    <dimen name="space_ultimate">36dp</dimen>
     <dimen name="space_extra">36dp</dimen>
+    <dimen name="space_ultimate">40dp</dimen>
+    <dimen name="space_universe">52dp</dimen>
 
     <dimen name="padding">@dimen/space_larger</dimen>
     <dimen name="button_height">64dp</dimen>

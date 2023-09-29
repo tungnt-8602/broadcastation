@@ -1,11 +1,13 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
+import java.io.Serializable
 
 class ItemRemoteAdapter(var callback: Callback) :
     RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
@@ -80,6 +82,7 @@ class ItemRemoteAdapter(var callback: Callback) :
      * Class
      ********************************************************************** */
     enum class Type { BLUETOOTH, HTTP, MQTT }
+    enum class HttpMethod { GET, POST }
     class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
     interface Callback {
         fun shareBluetooth(remote: Remote)

@@ -8,7 +8,7 @@
     tools:context=".presentation.add.mqtt.MqttFragment">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/url"
+        android:id="@+id/domain"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -19,11 +19,30 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/url_text"
+            android:id="@+id/domain_text"
             style="@style/SettingInput"
             android:layout_width="match_parent"
             android:layout_height="@dimen/icon_size"
-            android:hint="@string/url" />
+            android:hint="@string/domain_mqtt" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/port"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_large"
+        android:layout_marginTop="@dimen/space"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/domain">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/port_text"
+            style="@style/SettingInput"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/icon_size"
+            android:hint="@string/port_mqtt" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -35,7 +54,7 @@
         android:layout_marginTop="@dimen/space"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/url">
+        app:layout_constraintTop_toBottomOf="@id/port">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/channel_text"

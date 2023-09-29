@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/icon_size"
             android:enabled="false"
-            android:hint="@string/uuid" />
+            android:hint="@string/deviceId" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout

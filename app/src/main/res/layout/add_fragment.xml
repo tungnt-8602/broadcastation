@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -131,26 +132,44 @@
         android:paddingVertical="@dimen/space"
         app:layout_constraintTop_toBottomOf="@id/remote_common">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/option_remote"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/option_spinner"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/space_large"
-            app:endIconTint="@color/scc_800"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_spinner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:startIconDrawable="@drawable/ic_remote_option"
-            app:startIconTint="@color/scc_800">
+            app:layout_constraintTop_toTopOf="parent">
 
-            <AutoCompleteTextView
-                android:id="@+id/option_name_text"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/option_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:scaleType="center"
+                android:paddingHorizontal="@dimen/space_bonus"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:src="@drawable/ic_remote_option"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/scc_800"
+                android:contentDescription="@string/remote_option" />
+
+            <TextView
+                android:id="@+id/option_remote"
+                android:layout_width="0dp"
+                style="@style/Content"
+                android:paddingStart="@dimen/space_universe"
                 android:layout_height="match_parent"
                 android:hint="@string/remote_option"
-                android:labelFor="@id/option_remote" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:paddingVertical="@dimen/space_large"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="RtlSymmetry" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include
             android:id="@+id/local"
@@ -158,7 +177,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/option_remote" />
+            app:layout_constraintTop_toBottomOf="@id/option_spinner" />
 
         <include
             android:id="@+id/http"
@@ -166,7 +185,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/option_remote" />
+            app:layout_constraintTop_toBottomOf="@id/option_spinner" />
 
         <include
             android:id="@+id/mqtt"
@@ -174,7 +193,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/option_remote" />
+            app:layout_constraintTop_toBottomOf="@id/option_spinner" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

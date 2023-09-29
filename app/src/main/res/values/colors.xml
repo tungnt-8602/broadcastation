@@ -3,6 +3,7 @@
     <color name="transparent">#00000000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#cccccc</color>
 
     <color name="sound_cloud_color">#FF3300</color>
     <color name="scc_100">#fbb29f</color>

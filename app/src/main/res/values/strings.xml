@@ -2,11 +2,11 @@
     <string name="app_name">Broadcastation</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="local">Local</string>
+    <string name="local">Bluetooth</string>
     <string name="http">Http</string>
     <string name="mqtt">Mqtt</string>
     <string name="local_title">Bluetooth</string>
-    <string name="uuid">Uuid</string>
+    <string name="deviceId">Tên thiết bị</string>
     <string name="content">Nội dung phát</string>
     <string name="add_remote">Thêm điều khiển</string>
 
@@ -21,8 +21,8 @@
     <string name="remote_name">Tên điều khiển <font color="#e53001">*</font></string>
     <string name="save">Lưu</string>
     <string name="key_value">Key value <font color="#e53001">*</font></string>
-    <string name="url">Url <font color="#e53001">*</font></string>
-    <string name="path">Path <font color="#e53001">*</font></string>
+    <string name="domain_mqtt">Domain <font color="#e53001">*</font></string>
+    <string name="http_url">Url <font color="#e53001">*</font></string>
     <string name="channel">Kênh <font color="#e53001">*</font></string>
     <string name="broadcast">Phát</string>
     <string name="remote_icon">Icon</string>
@@ -39,6 +39,11 @@
     <string name="add_category_success">đã được thêm vào danh mục</string>
     <string name="filter">Lọc</string>
     <string name="quit_noti">Nhấn lần nữa để thoát</string>
+    <string name="http_method">HTTP METHOD <font color="#e53001">*</font></string>
+    <string name="get">GET</string>
+    <string name="post">POST</string>
+    <string name="not_empty_input">Nhập tên điều khiển</string>
+    <string name="port_mqtt">Port</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

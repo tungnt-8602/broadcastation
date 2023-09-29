@@ -8,12 +8,14 @@ import com.example.broadcastation.R
 import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.common.utility.DELAY_TIME_TO_QUIT
 import com.example.broadcastation.common.utility.FIRST_STACK
+import com.example.broadcastation.common.utility.TAG_HOME_FRAGMENT
 import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.ActivityMainBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     /* **********************************************************************
      * Variable
@@ -30,7 +32,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logger.i("Inflate home view")
-        viewModel.getData(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         window.statusBarColor = getColor(R.color.scc_300)
@@ -40,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         val transaction = fragmentManager.beginTransaction()
         transaction.add(
             R.id.mainContainer,
-            HomeFragment(callback = object : HomeFragment.Callback() {
+            HomeFragment.instance(callback = object : HomeFragment.Callback() {
                 override fun getAllRemote(): MutableList<Remote> {
                     return viewModel.getAllRemote()
                 }
@@ -51,6 +52,10 @@ class MainActivity : AppCompatActivity() {
 
                 override fun saveMessage(message: String) {
                     viewModel.saveMessageAction(message)
+                }
+
+                override fun getDeviceName(): String {
+                    return viewModel.getDeviceName()
                 }
 
                 override fun updateNotice(): String {
@@ -66,7 +71,8 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun postHttp(remote: Remote) {
-                    viewModel.postHttp(remote)
+//                    viewModel.postHttp(remote)
+                    viewModel.getHttp()
                 }
 
                 override fun publishMqtt(remote: Remote) {
@@ -102,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }),
-            "home"
+            TAG_HOME_FRAGMENT
         )
             .addToBackStack(null)
             .commit()

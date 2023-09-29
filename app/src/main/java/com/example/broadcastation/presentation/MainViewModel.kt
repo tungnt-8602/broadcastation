@@ -1,12 +1,11 @@
 package com.example.broadcastation.presentation
 
-import android.content.Context
-import androidx.lifecycle.MutableLiveData
+import android.os.Build
 import com.example.broadcastation.common.base.BaseViewModel
-import com.example.broadcastation.common.utility.BASE_URL
+import com.example.broadcastation.common.utility.POST_URL
 import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
-import com.example.broadcastation.common.utility.getUUID
+import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.RetrofitAPI
 import retrofit2.Call
@@ -19,15 +18,12 @@ class MainViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    val notice = MutableLiveData<String>()
 
     /* **********************************************************************
      * Function
      ********************************************************************** */
 
-    fun getData(context: Context) {
-        storage.deviceId = context.getUUID()
-    }
+    fun getDeviceName(): String = Build.MODEL
 
     fun addRemote(remote: Remote) {
         logger.i("added")
@@ -43,7 +39,7 @@ class MainViewModel : BaseViewModel() {
 
     fun postHttp(remote: Remote){
         val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(POST_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
@@ -54,6 +50,26 @@ class MainViewModel : BaseViewModel() {
             }
 
             override fun onFailure(call: Call<Remote?>, t: Throwable) {
+                local.saveMessageBroadcast(ERROR + t.message)
+            }
+        })
+    }
+
+    fun getHttp(){
+        val retrofit = Retrofit.Builder()
+            .baseUrl(GET_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
+        val call= retrofitAPI.getContent()
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                if(response.body().toString().isNotEmpty()){
+                    local.saveMessageBroadcast(response.body().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
                 local.saveMessageBroadcast(ERROR + t.message)
             }
         })

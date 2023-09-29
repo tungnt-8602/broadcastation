@@ -3,6 +3,11 @@ package com.example.broadcastation.common.utility
 import android.annotation.SuppressLint
 import android.content.Context
 import android.provider.Settings
+import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import androidx.annotation.MenuRes
+import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
@@ -14,10 +19,14 @@ const val ID_ARG = "id"
 const val EMPTY = "Không có gì"
 const val ERROR = "Lỗi: "
 
+const val GET_METHOD = "GET"
+const val POST_METHOD = "POST"
+
 const val TAG_HOME_FRAGMENT = "home"
 const val TAG_ADD_FRAGMENT = "add"
 const val TAG_UPDATE_FRAGMENT = "update"
-const val BASE_URL = "https://reqres.in/api/"
+const val POST_URL = "https://reqres.in/api/"
+const val GET_URL = "https://api.chucknorris.io/"
 
 const val FIRST_STACK = 1
 const val DELAY_TIME_TO_QUIT : Long = 2000
@@ -54,5 +63,15 @@ fun screenNavigate(fragmentManager: FragmentManager?, navDirection: MainActivity
         addToBackStack(null)
         setReorderingAllowed(true)
     }
+}
+
+fun showMenu(v: View, @MenuRes menuRes: Int, context: Context) {
+    val popup = PopupMenu(context, v)
+    popup.menuInflater.inflate(menuRes, popup.menu)
+    popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+        (v as TextView).text = menuItem.title.toString()
+        true
+    }
+    popup.show()
 }
 

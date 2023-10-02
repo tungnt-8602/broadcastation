@@ -158,7 +158,7 @@ class HomeFragment :
     /* **********************************************************************
      * Class
      ********************************************************************** */
-    abstract class Callback : AddFragment.Callback, Serializable {
+    interface Callback : AddFragment.Callback, Serializable {
         abstract fun grantBluetoothPermission(remote: Remote, callback: Callback)
         abstract fun shareBluetooth(remote: Remote, callback: Callback)
         abstract fun postHttp(remote: Remote)

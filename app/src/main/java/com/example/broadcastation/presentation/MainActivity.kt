@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
         val transaction = fragmentManager.beginTransaction()
         transaction.add(
             R.id.mainContainer,
-            HomeFragment.instance(callback = object : HomeFragment.Callback() {
+            HomeFragment.instance(callback = object : HomeFragment.Callback {
                 override fun getAllRemote(): MutableList<Remote> {
                     return viewModel.getAllRemote()
                 }

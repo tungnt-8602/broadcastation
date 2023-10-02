@@ -12,6 +12,9 @@ class AddViewModel : BaseViewModel() {
     val uuid = MutableLiveData<String>()
     val notice = MutableLiveData<String>()
 
+    val listRemote = R.array.remote_menu
+    val listCategoryRemote = R.array.remote_category
+
     /* **********************************************************************
      * Function
      ********************************************************************** */

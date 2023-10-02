@@ -27,5 +27,6 @@
 
     <!-- Tab Bar -->
     <dimen name="tab_bar_size">52dp</dimen>
+    <dimen name="half_spinner">180dp</dimen>
 
 </resources>

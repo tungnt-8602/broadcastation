@@ -44,6 +44,7 @@
     <string name="post">POST</string>
     <string name="not_empty_input">Nhập tên điều khiển</string>
     <string name="port_mqtt">Port</string>
+    <string name="ok">OK</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

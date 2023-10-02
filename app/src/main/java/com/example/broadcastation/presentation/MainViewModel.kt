@@ -45,7 +45,7 @@ class MainViewModel : BaseViewModel() {
             .build()
         val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
         val call: Call<Remote?>? = retrofitAPI.postRemoteContent(remote)
-        call!!.enqueue(object : Callback<Remote?> {
+        call?.enqueue(object : Callback<Remote?> {
             override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
                 local.saveMessageBroadcast(response.body()?.describe ?: EMPTY)
             }

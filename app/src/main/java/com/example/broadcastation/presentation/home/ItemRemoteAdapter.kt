@@ -9,7 +9,7 @@ import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
 import java.io.Serializable
 
-class ItemRemoteAdapter(var callback: Callback) :
+class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.Callback) :
     RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
     /* **********************************************************************
      * Variable
@@ -44,7 +44,7 @@ class ItemRemoteAdapter(var callback: Callback) :
         holder.binding.broadcast.setOnClickListener {
             when (data[position].type) {
                 Type.BLUETOOTH -> {
-                    callback.shareBluetooth(data[position])
+                    callback.shareBluetooth(data[position], homeCallback)
                 }
 
                 Type.HTTP -> {
@@ -85,7 +85,7 @@ class ItemRemoteAdapter(var callback: Callback) :
     enum class HttpMethod { GET, POST }
     class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
     interface Callback {
-        fun shareBluetooth(remote: Remote)
+        fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback)
         fun postHttp(remote: Remote)
         fun publishMqtt(remote: Remote)
     }

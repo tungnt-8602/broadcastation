@@ -8,9 +8,12 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.broadcastation.common.base.BaseControl
+import com.example.broadcastation.common.logger.Logger
+import com.example.broadcastation.presentation.MainViewModel
 
 class PermissionControl(private val activity: AppCompatActivity)  : BaseControl() {
     /* **********************************************************************
@@ -47,6 +50,7 @@ class PermissionControl(private val activity: AppCompatActivity)  : BaseControl(
         activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
                 logger.i("Granted : ACTION_REQUEST_ENABLE BLUETOOTH")
+                callbackCall(CallbackAction.SUCCESS)
             } else {
                 logger.i("Denied : ACTION_REQUEST_ENABLE BLUETOOTH")
                 callbackCall(CallbackAction.FAIL)

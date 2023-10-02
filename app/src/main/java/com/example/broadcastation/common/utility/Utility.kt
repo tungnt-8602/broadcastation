@@ -2,6 +2,7 @@ package com.example.broadcastation.common.utility
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
@@ -62,6 +63,28 @@ fun screenNavigate(fragmentManager: FragmentManager?, navDirection: MainActivity
         )
         addToBackStack(null)
         setReorderingAllowed(true)
+    }
+}
+
+fun getDeviceName(): String {
+    val manufacturer: String = Build.MANUFACTURER
+    val model: String = Build.MODEL
+    return if (model.startsWith(manufacturer)) {
+        capitalize(model)
+    } else {
+        capitalize(manufacturer) + model
+    }
+}
+
+private fun capitalize(s: String?): String {
+    if (s.isNullOrEmpty()) {
+        return ""
+    }
+    val first = s[0]
+    return if (Character.isUpperCase(first)) {
+        s
+    } else {
+        first.uppercaseChar().toString() + s.substring(1)
     }
 }
 

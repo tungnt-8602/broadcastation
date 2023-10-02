@@ -1,10 +1,19 @@
 package com.example.broadcastation.presentation
 
+import android.bluetooth.BluetoothManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.StrictMode
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import com.example.broadcastation.R
+import android.view.View
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.broadcastation.BroadcastService
 import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.common.utility.DELAY_TIME_TO_QUIT
 import com.example.broadcastation.common.utility.FIRST_STACK
@@ -27,8 +36,30 @@ class MainActivity : AppCompatActivity() {
     private var doubleBackToExitPressedOnce = false
 
     /* **********************************************************************
+     * Broadcast & Service
+     ********************************************************************** */
+    private val bleServiceReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val bundle = intent.extras ?: return
+
+            logger.i("get advertise name")
+            val advertiseName = bundle.getString(BroadcastService.STA_ADVERTISING_NAME)
+            if (!advertiseName.isNullOrEmpty()) {
+                viewModel.setAdvertiseName(advertiseName)
+            }
+
+            logger.i("error advertise name")
+            val notify = bundle.getString(BroadcastService.STA_ADVERTISING_ERROR)
+            notify?.let { Snackbar.make(binding.root, "$notify", Snackbar.LENGTH_SHORT).show() }
+
+        }
+    }
+
+
+    /* **********************************************************************
      * Life Cycle
      ********************************************************************** */
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logger.i("Inflate home view")
@@ -62,12 +93,12 @@ class MainActivity : AppCompatActivity() {
                     return viewModel.getMessageAction()
                 }
 
-                override fun grantBluetoothPermission() {
-                    grantPermission()
+                override fun grantBluetoothPermission(remote: Remote, callback: HomeFragment.Callback) {
+                    grantPermission(remote, callback)
                 }
 
-                override fun shareBluetooth(remote: Remote) {
-                    viewModel.shareBluetooth(remote)
+                override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
+                    viewModel.shareBluetooth(remote, callback)
                 }
 
                 override fun postHttp(remote: Remote) {
@@ -95,6 +126,15 @@ class MainActivity : AppCompatActivity() {
                     viewModel.saveMessageBroadcast(message)
                 }
 
+                override fun startAdvertise(advertise: String, message: String) {
+                    permission.turnOnBluetooth()
+                    BroadcastService.startAdvertise(this@MainActivity, BroadcastService.AdvertiseData(advertise, message))
+                }
+
+                override fun stopAdvertise() {
+                    BroadcastService.stopAdvertise(this@MainActivity)
+                }
+
                 override fun addRemote(remote: Remote) {
                     viewModel.addRemote(remote)
                 }
@@ -112,6 +152,13 @@ class MainActivity : AppCompatActivity() {
         )
             .addToBackStack(null)
             .commit()
+
+        logger.i("register broadcast")
+        val filter = IntentFilter(BroadcastService.STA_ACTION)
+        LocalBroadcastManager.getInstance(this).registerReceiver(bleServiceReceiver, filter)
+
+        val builder = StrictMode.VmPolicy.Builder()
+        StrictMode.setVmPolicy(builder.build())
     }
 
     @Deprecated("Deprecated in Java")
@@ -136,24 +183,47 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         viewModel.saveMessageAction("")
+        startService()
         super.onStart()
+    }
+
+    override fun onDestroy() {
+        try{
+            logger.i("stop services")
+            BroadcastService.stopService(this)
+        }catch (e: Exception){
+            logger.w(e.message ?: "onDestroy")
+        }
+        super.onDestroy()
     }
 
     /* **********************************************************************
      * Function
      ********************************************************************** */
-    fun grantPermission() {
+    fun grantPermission(remote: Remote, callback: HomeFragment.Callback) {
         permission.registerCallback(MainActivity::class.java.name,
             object : PermissionControl.PermissionCallback {
                 override fun grantSuccess() {
                     permission.turnOnBluetooth()
+                    var isTurnedOn =
+                        getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
+                    if (isTurnedOn == true) {
+                        viewModel.shareBluetooth(remote, callback)
+                        return
+                    }
                 }
 
                 override fun grantFail(error: String) {
                     logger.e(error)
                 }
             })
+
         permission.grantPermissions()
+    }
+
+    private fun startService() {
+        logger.i("start service")
+        BroadcastService.initService(this)
     }
 
     /* **********************************************************************

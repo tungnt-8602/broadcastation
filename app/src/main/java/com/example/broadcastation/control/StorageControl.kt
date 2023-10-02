@@ -6,6 +6,8 @@ class StorageControl : BaseControl() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
+
+    var advertisingName = ""
     companion object {
         var instance = StorageControl()
     }

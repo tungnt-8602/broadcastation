@@ -24,18 +24,12 @@ class BluetoothControl(val callback: Callback) : BaseControl() {
      * Variable
      ********************************************************************** */
     private val adapterNameDefault = "Broadcastation"
-    private val uuidDefault = "CDB7950D-73F1-4D4D-8E47-C090502DBD63"
     private var isChangeName: Boolean? = false
     private var adapterName = adapterNameDefault
     private var message = ""
     private var isPowerInclude = true
     private var nameMaxLength = 10
     private var bluetoothAdapter: BluetoothAdapter? = null
-
-    private var bluetoothScanner: BluetoothLeScanner? = null
-    private var bluetoothScannerSetting: ScanSettings? = null
-    private var bluetoothScannerFilters: ArrayList<ScanFilter> = arrayListOf()
-
     private var bluetoothAdvertiser: BluetoothLeAdvertiser? = null
     private var bluetoothAdvertiserSetting: AdvertiseSettings? = null
     private var bluetoothAdvertiserData: AdvertiseData? = null
@@ -126,7 +120,6 @@ class BluetoothControl(val callback: Callback) : BaseControl() {
 
         logger.i("create bluetooth advertiser data")
         val pUuid = parcelFromShortValue(1234)
-//        val advertiseString = "D"
         val advertiseString = message
         logger.d("advertiser name[${adapterName}] - pUuid[$pUuid]")
         bluetoothAdvertiserData = AdvertiseData.Builder().apply {

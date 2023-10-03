@@ -70,84 +70,86 @@ class MainActivity : AppCompatActivity() {
         logger.i("Add HomeFragment")
         val fragmentManager = supportFragmentManager
         val transaction = fragmentManager.beginTransaction()
+        val homeFragment = HomeFragment()
+        homeFragment.setCallback(callback = object : HomeFragment.Callback {
+            override fun getAllRemote(): MutableList<Remote> {
+                return viewModel.getAllRemote()
+            }
+
+            override fun getActionRemote(): String {
+                return viewModel.getActionRemote()
+            }
+
+            override fun saveMessage(message: String) {
+                viewModel.saveMessageAction(message)
+            }
+
+            override fun getDeviceName(): String {
+                return viewModel.getDeviceName()
+            }
+
+            override fun updateNotice(): String {
+                return viewModel.getMessageAction()
+            }
+
+            override fun grantBluetoothPermission(remote: Remote, callback: HomeFragment.Callback) {
+                grantPermission(remote, callback)
+            }
+
+            override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
+                viewModel.shareBluetooth(remote, callback)
+            }
+
+            override fun postHttp(remote: Remote) {
+//                    viewModel.postHttp(remote)
+                viewModel.getHttp()
+            }
+
+            override fun publishMqtt(remote: Remote) {
+                viewModel.publishMqtt(remote)
+            }
+
+            override fun saveMessageAction(message: String) {
+                viewModel.saveMessageAction(message)
+            }
+
+            override fun getMessageAction(): String {
+                return viewModel.getMessageAction()
+            }
+
+            override fun getMessageBroadcast(): String {
+                return viewModel.getMessageBroadcast()
+            }
+
+            override fun saveMessageBroadcast(message: String) {
+                viewModel.saveMessageBroadcast(message)
+            }
+
+            override fun startAdvertise(advertise: String, message: String) {
+                permission.turnOnBluetooth()
+                BroadcastService.startAdvertise(this@MainActivity, BroadcastService.AdvertiseData(advertise, message))
+            }
+
+            override fun stopAdvertise() {
+                BroadcastService.stopAdvertise(this@MainActivity)
+            }
+
+            override fun addRemote(remote: Remote) {
+                viewModel.addRemote(remote)
+            }
+
+            override fun findRemoteById(id: Int): Remote {
+                return viewModel.getAllRemote().find { it.id == id }!!
+            }
+
+            override fun updateRemote(remotes: MutableList<Remote>) {
+                viewModel.saveAllRemote(remotes)
+            }
+
+        })
         transaction.add(
             R.id.mainContainer,
-            HomeFragment.instance(callback = object : HomeFragment.Callback {
-                override fun getAllRemote(): MutableList<Remote> {
-                    return viewModel.getAllRemote()
-                }
-
-                override fun getActionRemote(): String {
-                    return viewModel.getActionRemote()
-                }
-
-                override fun saveMessage(message: String) {
-                    viewModel.saveMessageAction(message)
-                }
-
-                override fun getDeviceName(): String {
-                    return viewModel.getDeviceName()
-                }
-
-                override fun updateNotice(): String {
-                    return viewModel.getMessageAction()
-                }
-
-                override fun grantBluetoothPermission(remote: Remote, callback: HomeFragment.Callback) {
-                    grantPermission(remote, callback)
-                }
-
-                override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
-                    viewModel.shareBluetooth(remote, callback)
-                }
-
-                override fun postHttp(remote: Remote) {
-//                    viewModel.postHttp(remote)
-                    viewModel.getHttp()
-                }
-
-                override fun publishMqtt(remote: Remote) {
-                    viewModel.publishMqtt(remote)
-                }
-
-                override fun saveMessageAction(message: String) {
-                    viewModel.saveMessageAction(message)
-                }
-
-                override fun getMessageAction(): String {
-                    return viewModel.getMessageAction()
-                }
-
-                override fun getMessageBroadcast(): String {
-                    return viewModel.getMessageBroadcast()
-                }
-
-                override fun saveMessageBroadcast(message: String) {
-                    viewModel.saveMessageBroadcast(message)
-                }
-
-                override fun startAdvertise(advertise: String, message: String) {
-                    permission.turnOnBluetooth()
-                    BroadcastService.startAdvertise(this@MainActivity, BroadcastService.AdvertiseData(advertise, message))
-                }
-
-                override fun stopAdvertise() {
-                    BroadcastService.stopAdvertise(this@MainActivity)
-                }
-
-                override fun addRemote(remote: Remote) {
-                    viewModel.addRemote(remote)
-                }
-
-                override fun findRemoteById(id: Int): Remote {
-                    return viewModel.getAllRemote().find { it.id == id }!!
-                }
-
-                override fun updateRemote(remotes: MutableList<Remote>) {
-                    viewModel.saveAllRemote(remotes)
-                }
-
-            }),
+            homeFragment,
             TAG_HOME_FRAGMENT
         )
             .addToBackStack(null)

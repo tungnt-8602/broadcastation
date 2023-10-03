@@ -36,16 +36,7 @@ class HomeFragment :
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
     private val viewModel: MainViewModel by activityViewModels()
-
-    companion object {
-        fun instance(callback: Callback): HomeFragment {
-            val homeFragment = HomeFragment()
-            val args = Bundle()
-            args.putSerializable("callback", callback)
-            homeFragment.arguments = args
-            return homeFragment
-        }
-    }
+    private var callback: Callback? = null
 
     /* **********************************************************************
      * Life Cycle
@@ -55,7 +46,7 @@ class HomeFragment :
     @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val callback = arguments?.getSerializable("callback", Callback::class.java)
+
         if (!isAdded) {
             return
         }
@@ -154,6 +145,10 @@ class HomeFragment :
     /* **********************************************************************
      * Function
      ********************************************************************** */
+
+    fun setCallback(callback: Callback) {
+        this.callback = callback
+    }
 
     /* **********************************************************************
      * Class

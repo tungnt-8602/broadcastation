@@ -170,9 +170,14 @@ class AddFragment :
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
             callback?.saveMessage("")
+
+
             (fragmentManager?.findFragmentByTag(
                 TAG_HOME_FRAGMENT
-            ) ?: callback?.let { callback -> HomeFragment.instance(callback) })?.let { fragment ->
+            ) ?: callback?.let { callback ->
+                val homeFragment = HomeFragment()
+                homeFragment.setCallback(callback)
+               homeFragment })?.let { fragment ->
                 screenNavigate(
                     fragmentManager,
                     MainActivity.Navigate.DOWN,
@@ -308,7 +313,9 @@ class AddFragment :
                 )
             }
             (fragmentManager?.findFragmentByTag(TAG_HOME_FRAGMENT) ?: callback?.let { callback ->
-                HomeFragment.instance(callback)
+                val homeFragment = HomeFragment()
+                homeFragment.setCallback(callback)
+                homeFragment
             })?.let { fragment ->
                 screenNavigate(
                     fragmentManager,

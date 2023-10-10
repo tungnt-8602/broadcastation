@@ -6,6 +6,7 @@ import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
 import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.POST_URL
+import com.example.broadcastation.control.remote.RemoteControl
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.RetrofitAPI
 import com.example.broadcastation.presentation.home.HomeFragment
@@ -81,8 +82,10 @@ class MainViewModel : BaseViewModel() {
         callback.startAdvertise(remote.name, remote.describe)
     }
 
-    fun publishMqtt(remote: Remote) {
+    fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
         logger.i("Mqtt broadcast: ${remote.name}")
+        callback.saveMessageBroadcast(remote.name)
+        remotee.sendMessage(callback.getMessageBroadcast())
     }
 
     fun setAdvertiseName(name: String?) {

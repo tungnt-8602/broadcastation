@@ -1,9 +1,7 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -29,14 +27,13 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.Serializable
 
 
-class HomeFragment :
+class HomeFragment(private val callback: Callback) :
     BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
     private val viewModel: MainViewModel by activityViewModels()
-    private var callback: Callback? = null
 
     /* **********************************************************************
      * Life Cycle
@@ -79,20 +76,15 @@ class HomeFragment :
                 }
 
                 override fun postHttp(remote: Remote) {
-                    callback?.postHttp(remote)
-                    callback?.getMessageBroadcast()?.let {
+                    callback.postHttp(remote)
+                    callback.getMessageBroadcast()?.let {
                         Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
                             .setAnchorView(binding.add).show()
                     }
                 }
 
-                override fun publishMqtt(remote: Remote) {
-                    callback?.publishMqtt(remote)
-                    callback?.saveMessageBroadcast(remote.name)
-                    callback?.getMessageBroadcast()?.let {
-                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                            .setAnchorView(binding.add).show()
-                    }
+                override fun publishMqtt(remote: Remote, callback: Callback) {
+                    callback.publishMqtt(remote, callback)
                 }
 
 
@@ -107,7 +99,7 @@ class HomeFragment :
         adapter?.setOnItemTouchListener {
             callback?.saveMessageAction(TAG_UPDATE_FRAGMENT)
             setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))
-            callback?.let { callback -> AddFragment.instance(callback) }?.let { fragment ->
+            callback?.let { callback -> AddFragment(callback) }?.let { fragment ->
                 screenNavigate(
                     fragmentManager,
                     MainActivity.Navigate.UP,
@@ -120,7 +112,7 @@ class HomeFragment :
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
             callback?.saveMessageAction(TAG_ADD_FRAGMENT)
-            callback?.let { callback -> AddFragment.instance(callback) }?.let { fragment ->
+            callback?.let { callback -> AddFragment(callback) }?.let { fragment ->
                 screenNavigate(
                     fragmentManager,
                     MainActivity.Navigate.UP,
@@ -142,13 +134,19 @@ class HomeFragment :
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        logger.e("onDestroyView")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logger.e("onDestroy")
+    }
+
     /* **********************************************************************
      * Function
      ********************************************************************** */
-
-    fun setCallback(callback: Callback) {
-        this.callback = callback
-    }
 
     /* **********************************************************************
      * Class
@@ -157,7 +155,7 @@ class HomeFragment :
         abstract fun grantBluetoothPermission(remote: Remote, callback: Callback)
         abstract fun shareBluetooth(remote: Remote, callback: Callback)
         abstract fun postHttp(remote: Remote)
-        abstract fun publishMqtt(remote: Remote)
+        abstract fun publishMqtt(remote: Remote, callback: Callback)
 
         abstract fun updateNotice(): String
         abstract fun saveMessageAction(message: String)

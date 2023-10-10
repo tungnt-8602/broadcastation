@@ -52,7 +52,7 @@ class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.C
                 }
 
                 Type.MQTT -> {
-                    callback.publishMqtt(data[position])
+                    callback.publishMqtt(data[position], homeCallback)
                 }
             }
         }
@@ -87,6 +87,6 @@ class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.C
     interface Callback {
         fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback)
         fun postHttp(remote: Remote)
-        fun publishMqtt(remote: Remote)
+        fun publishMqtt(remote: Remote, callback: HomeFragment.Callback)
     }
 }

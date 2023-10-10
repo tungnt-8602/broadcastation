@@ -8,6 +8,13 @@ class StorageControl : BaseControl() {
      ********************************************************************** */
 
     var advertisingName = ""
+    var domainMqtt = "tcp://mqtt.bctoyz.com:1883"
+    val userName = "Android"
+    val passWord = "android123"
+    var channel = "event1/all"
+    var port = ""
+    var content = ""
+
     companion object {
         var instance = StorageControl()
     }

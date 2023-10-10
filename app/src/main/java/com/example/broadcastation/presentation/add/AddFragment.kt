@@ -23,6 +23,7 @@ import com.example.broadcastation.common.utility.TAG_HOME_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.common.utility.showMenu
+import com.example.broadcastation.control.StorageControl
 import com.example.broadcastation.databinding.AddFragmentBinding
 import com.example.broadcastation.entity.BluetoothConfig
 import com.example.broadcastation.entity.Config
@@ -38,8 +39,9 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
+import kotlin.math.log
 
-class AddFragment :
+class AddFragment(private val callback: HomeFragment.Callback) :
     BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
@@ -49,16 +51,6 @@ class AddFragment :
     private var typeBroadcast: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
     private lateinit var remoteUpdate: Remote
     private val addViewModel: AddViewModel by viewModels()
-
-    companion object {
-        fun instance(callback: HomeFragment.Callback): AddFragment {
-            val addFragment = AddFragment()
-            val args = Bundle()
-            args.putSerializable("callback", callback)
-            addFragment.arguments = args
-            return addFragment
-        }
-    }
 
     /* **********************************************************************
      * Life Cycle
@@ -115,6 +107,8 @@ class AddFragment :
                 icon = R.drawable.ic_mqtt
                 config = gson.toJson(
                     MqttConfig(
+                        StorageControl.instance.userName,
+                        StorageControl.instance.passWord,
                         binding.mqtt.domainText.text.toString(),
                         binding.mqtt.portText.text.toString(),
                         binding.mqtt.channelText.text.toString(),
@@ -163,7 +157,6 @@ class AddFragment :
     @SuppressLint("ResourceType")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun initView() {
-        val callback = arguments?.getSerializable("callback", HomeFragment.Callback::class.java)
         fragmentManager = activity?.supportFragmentManager
 
         logger.i("Navigate back")
@@ -175,8 +168,7 @@ class AddFragment :
             (fragmentManager?.findFragmentByTag(
                 TAG_HOME_FRAGMENT
             ) ?: callback?.let { callback ->
-                val homeFragment = HomeFragment()
-                homeFragment.setCallback(callback)
+                val homeFragment = HomeFragment(callback)
                homeFragment })?.let { fragment ->
                 screenNavigate(
                     fragmentManager,
@@ -313,8 +305,7 @@ class AddFragment :
                 )
             }
             (fragmentManager?.findFragmentByTag(TAG_HOME_FRAGMENT) ?: callback?.let { callback ->
-                val homeFragment = HomeFragment()
-                homeFragment.setCallback(callback)
+                val homeFragment = HomeFragment(callback)
                 homeFragment
             })?.let { fragment ->
                 screenNavigate(

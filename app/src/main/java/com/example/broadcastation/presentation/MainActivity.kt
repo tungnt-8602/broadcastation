@@ -5,15 +5,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.StrictMode
 import androidx.activity.viewModels
-import com.example.broadcastation.R
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.broadcastation.BroadcastService
+import com.example.broadcastation.R
 import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.common.utility.DELAY_TIME_TO_QUIT
 import com.example.broadcastation.common.utility.FIRST_STACK
@@ -61,6 +62,8 @@ class MainActivity : AppCompatActivity() {
      ********************************************************************** */
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val fragmentManager = supportFragmentManager
+        fragmentManager.fragmentFactory = CustomFragmentFactory()
         super.onCreate(savedInstanceState)
         logger.i("Inflate home view")
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -68,10 +71,9 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = getColor(R.color.scc_300)
 
         logger.i("Add HomeFragment")
-        val fragmentManager = supportFragmentManager
+
         val transaction = fragmentManager.beginTransaction()
-        val homeFragment = HomeFragment()
-        homeFragment.setCallback(callback = object : HomeFragment.Callback {
+        val homeFragment = HomeFragment(object : HomeFragment.Callback {
             override fun getAllRemote(): MutableList<Remote> {
                 return viewModel.getAllRemote()
             }
@@ -105,8 +107,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel.getHttp()
             }
 
-            override fun publishMqtt(remote: Remote) {
-                viewModel.publishMqtt(remote)
+            override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
+                viewModel.publishMqtt(remote, callback)
             }
 
             override fun saveMessageAction(message: String) {
@@ -127,7 +129,10 @@ class MainActivity : AppCompatActivity() {
 
             override fun startAdvertise(advertise: String, message: String) {
                 permission.turnOnBluetooth()
-                BroadcastService.startAdvertise(this@MainActivity, BroadcastService.AdvertiseData(advertise, message))
+                BroadcastService.startAdvertise(
+                    this@MainActivity,
+                    BroadcastService.AdvertiseData(advertise, message)
+                )
             }
 
             override fun stopAdvertise() {
@@ -147,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
+
         transaction.add(
             R.id.mainContainer,
             homeFragment,
@@ -172,7 +178,11 @@ class MainActivity : AppCompatActivity() {
                 return
             }
             doubleBackToExitPressedOnce = true
-            Snackbar.make(binding.root, resources.getString(R.string.quit_noti), Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(
+                binding.root,
+                resources.getString(R.string.quit_noti),
+                Snackbar.LENGTH_SHORT
+            ).show()
 
             Handler().postDelayed({
                 doubleBackToExitPressedOnce =
@@ -190,10 +200,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        try{
+        try {
             logger.i("stop services")
             BroadcastService.stopService(this)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             logger.w(e.message ?: "onDestroy")
         }
         super.onDestroy()
@@ -233,5 +243,95 @@ class MainActivity : AppCompatActivity() {
      ********************************************************************** */
     enum class Navigate {
         UP, DOWN
+    }
+
+    inner class CustomFragmentFactory : FragmentFactory() {
+        override fun instantiate(classLoader: ClassLoader, className: String): Fragment {
+            if (className == HomeFragment::class.java.name) {
+                return HomeFragment(object : HomeFragment.Callback {
+                    override fun getAllRemote(): MutableList<Remote> {
+                        return viewModel.getAllRemote()
+                    }
+
+                    override fun getActionRemote(): String {
+                        return viewModel.getActionRemote()
+                    }
+
+                    override fun saveMessage(message: String) {
+                        viewModel.saveMessageAction(message)
+                    }
+
+                    override fun getDeviceName(): String {
+                        return viewModel.getDeviceName()
+                    }
+
+                    override fun updateNotice(): String {
+                        return viewModel.getMessageAction()
+                    }
+
+                    override fun grantBluetoothPermission(
+                        remote: Remote,
+                        callback: HomeFragment.Callback
+                    ) {
+                        grantPermission(remote, callback)
+                    }
+
+                    override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
+                        viewModel.shareBluetooth(remote, callback)
+                    }
+
+                    override fun postHttp(remote: Remote) {
+//                    viewModel.postHttp(remote)
+                        viewModel.getHttp()
+                    }
+
+                    override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
+                        viewModel.publishMqtt(remote, callback)
+                    }
+
+                    override fun saveMessageAction(message: String) {
+                        viewModel.saveMessageAction(message)
+                    }
+
+                    override fun getMessageAction(): String {
+                        return viewModel.getMessageAction()
+                    }
+
+                    override fun getMessageBroadcast(): String {
+                        return viewModel.getMessageBroadcast()
+                    }
+
+                    override fun saveMessageBroadcast(message: String) {
+                        viewModel.saveMessageBroadcast(message)
+                    }
+
+                    override fun startAdvertise(advertise: String, message: String) {
+                        permission.turnOnBluetooth()
+                        BroadcastService.startAdvertise(
+                            this@MainActivity,
+                            BroadcastService.AdvertiseData(advertise, message)
+                        )
+                    }
+
+                    override fun stopAdvertise() {
+                        BroadcastService.stopAdvertise(this@MainActivity)
+                    }
+
+                    override fun addRemote(remote: Remote) {
+                        viewModel.addRemote(remote)
+                    }
+
+                    override fun findRemoteById(id: Int): Remote {
+                        return viewModel.getAllRemote().find { it.id == id }!!
+                    }
+
+                    override fun updateRemote(remotes: MutableList<Remote>) {
+                        viewModel.saveAllRemote(remotes)
+                    }
+
+                })
+            }
+            return super.instantiate(classLoader, className)
+        }
     }
 }

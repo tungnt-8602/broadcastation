@@ -15,9 +15,14 @@ class AddViewModel : BaseViewModel() {
     val listRemote = R.array.remote_menu
     val listCategoryRemote = R.array.remote_category
 
+
     /* **********************************************************************
      * Function
      ********************************************************************** */
+
+    fun noticeVerify(newNotice: String){
+        notice.value = newNotice
+    }
 
 
     /* **********************************************************************

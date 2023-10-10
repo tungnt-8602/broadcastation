@@ -4,9 +4,9 @@ import android.os.Build
 import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
+import com.example.broadcastation.common.utility.GET_SUCCESS
 import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.POST_URL
-import com.example.broadcastation.control.remote.RemoteControl
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.RetrofitAPI
 import com.example.broadcastation.presentation.home.HomeFragment
@@ -67,7 +67,7 @@ class MainViewModel : BaseViewModel() {
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.body().toString().isNotEmpty()) {
-                    local.saveMessageBroadcast(response.body().toString())
+                    local.saveMessageBroadcast("$GET_SUCCESS $GET_URL")
                 }
             }
 

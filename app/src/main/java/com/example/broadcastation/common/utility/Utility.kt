@@ -20,6 +20,9 @@ const val ID_ARG = "id"
 const val EMPTY = "Không có gì"
 const val ERROR = "Lỗi: "
 
+const val USER_NAME= "tungnt"
+const val PASSWORD = "8602"
+
 const val GET_METHOD = "GET"
 const val POST_METHOD = "POST"
 
@@ -28,6 +31,7 @@ const val TAG_ADD_FRAGMENT = "add"
 const val TAG_UPDATE_FRAGMENT = "update"
 const val POST_URL = "https://reqres.in/api/"
 const val GET_URL = "https://api.chucknorris.io/"
+const val GET_SUCCESS = "Lấy dữ liệu thành công từ"
 
 const val FIRST_STACK = 1
 const val DELAY_TIME_TO_QUIT : Long = 2000

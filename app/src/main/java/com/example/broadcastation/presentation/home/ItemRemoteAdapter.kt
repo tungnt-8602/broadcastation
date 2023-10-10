@@ -1,15 +1,16 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
-import java.io.Serializable
+import com.example.broadcastation.entity.http.HttpConfig
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
-class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.Callback) :
+class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFragment.Callback) :
     RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
     /* **********************************************************************
      * Variable
@@ -48,11 +49,18 @@ class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.C
                 }
 
                 Type.HTTP -> {
-                    callback.postHttp(data[position])
+                    val type = object : TypeToken<HttpConfig>() {}.type
+                    val gson = Gson()
+                    val config = gson.fromJson(data[position].config, type) as HttpConfig
+                    if(config.method == HttpMethod.POST){
+                        callback.postHttp(data[position])
+                    }else{
+                        callback.getHttp(data[position])
+                    }
                 }
 
                 Type.MQTT -> {
-                    callback.publishMqtt(data[position], homeCallback)
+                    callback.publishMqtt(data[position])
                 }
             }
         }
@@ -87,6 +95,7 @@ class ItemRemoteAdapter(var callback: Callback, var homeCallback: HomeFragment.C
     interface Callback {
         fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback)
         fun postHttp(remote: Remote)
-        fun publishMqtt(remote: Remote, callback: HomeFragment.Callback)
+        fun getHttp(remote: Remote)
+        fun publishMqtt(remote: Remote)
     }
 }

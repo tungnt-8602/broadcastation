@@ -45,6 +45,13 @@
     <string name="not_empty_input">Nhập tên điều khiển</string>
     <string name="port_mqtt">Port</string>
     <string name="ok">OK</string>
+    <string name="new_notice">Chưa nhập tên điều khiển</string>
+    <string name="empty_name">Tên điều khiển chưa hợp lệ, hãy nhập đầy đủ</string>
+    <string name="empty_http_url">Đường dẫn chưa hợp lệ, hãy nhập đầy đủ</string>
+    <string name="empty_mqtt_domain_channel">Domain hoặc kênh chưa hợp lệ, hãy nhập lại</string>
+    <string name="get_http_message">Lấy dữ liệu thành công từ</string>
+    <string name="post_http_notice">Phát dữ liệu thành công</string>
+    <string name="get_http_notice">Lấy dữ liệu thành công</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

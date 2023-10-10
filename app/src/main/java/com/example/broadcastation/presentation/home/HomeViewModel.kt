@@ -1,27 +1,63 @@
 package com.example.broadcastation.presentation.home
 
-import android.view.View
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
-import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.entity.http.RetrofitAPI
-import com.google.android.material.snackbar.Snackbar
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import org.eclipse.paho.android.service.MqttAndroidClient
+import org.eclipse.paho.client.mqttv3.IMqttActionListener
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
+import org.eclipse.paho.client.mqttv3.IMqttToken
+import org.eclipse.paho.client.mqttv3.MqttCallback
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions
+import org.eclipse.paho.client.mqttv3.MqttException
+import org.eclipse.paho.client.mqttv3.MqttMessage
 
 
 class HomeViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
+    val notice = MutableLiveData<String>()
 
     /* **********************************************************************
      * Function
      ********************************************************************** */
+    fun noticeBroadcast(newNotice: String){
+        notice.value = newNotice
+    }
+
+    fun connect(context: Context) {
+        val serverURI = "tcp://broker.emqx.io:1883"
+        val mqttClient = MqttAndroidClient(context, serverURI, "kotlin_client")
+        mqttClient.setCallback(object : MqttCallback {
+            override fun messageArrived(topic: String?, message: MqttMessage?) {
+                logger.i("Receive message: ${message.toString()} from topic: $topic")
+            }
+
+            override fun connectionLost(cause: Throwable?) {
+                logger.i("Connection lost ${cause.toString()}")
+            }
+
+            override fun deliveryComplete(token: IMqttDeliveryToken?) {
+
+            }
+        })
+        val options = MqttConnectOptions()
+        try {
+            mqttClient.connect(options, null, object : IMqttActionListener {
+                override fun onSuccess(asyncActionToken: IMqttToken?) {
+                    logger.i("Connection success")
+                }
+
+                override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
+                    logger.i("Connection failure")
+                }
+            })
+        } catch (e: MqttException) {
+            e.printStackTrace()
+        }
+
+    }
 
 
     /* **********************************************************************

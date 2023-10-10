@@ -10,6 +10,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
@@ -19,21 +20,24 @@ import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.databinding.HomeFragmentBinding
+import com.example.broadcastation.entity.MqttConfig
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
 import com.google.android.material.snackbar.Snackbar
-import java.io.Serializable
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 
-class HomeFragment(private val callback: Callback) :
+class HomeFragment(val callback: Callback) :
     BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
     private var fragmentManager: FragmentManager? = null
     private val viewModel: MainViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by viewModels()
 
     /* **********************************************************************
      * Life Cycle
@@ -43,15 +47,14 @@ class HomeFragment(private val callback: Callback) :
     @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         if (!isAdded) {
             return
         }
         fragmentManager = activity?.supportFragmentManager
 
         logger.i("Empty/list display")
-        val remoteList = callback?.getAllRemote()
-        if (remoteList?.isEmpty() == true || remoteList?.size == 0) {
+        val remoteList = callback.getAllRemote()
+        if (remoteList.isEmpty()) {
             binding.empty.visibility = View.VISIBLE
             binding.remoteList.visibility = View.GONE
         } else {
@@ -62,86 +65,78 @@ class HomeFragment(private val callback: Callback) :
         logger.i("Recycler view")
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val adapter = callback?.let {
-            ItemRemoteAdapter(callback = object : ItemRemoteAdapter.Callback {
-                override fun shareBluetooth(remote: Remote, callback: Callback) {
-                    var isTurnedOn =
-                        activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
-                    if (isTurnedOn == true) {
-                        viewModel.shareBluetooth(remote, callback)
-                        return
-                    } else {
-                        callback.grantBluetoothPermission(remote, callback)
-                    }
+        val adapter = ItemRemoteAdapter(callback = object : ItemRemoteAdapter.Callback {
+            override fun shareBluetooth(remote: Remote, callback: Callback) {
+                val isTurnedOn =
+                    activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
+                if (isTurnedOn == true) {
+                    viewModel.shareBluetooth(remote, callback)
+                    return
+                } else {
+                    callback.grantBluetoothPermission(remote, callback)
                 }
+            }
 
-                override fun postHttp(remote: Remote) {
-                    callback.postHttp(remote)
-                    callback.getMessageBroadcast()?.let {
-                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                            .setAnchorView(binding.add).show()
-                    }
+            override fun postHttp(remote: Remote) {
+                callback.postHttp(remote)
+                homeViewModel.noticeBroadcast(resources.getString(R.string.post_http_notice))
+            }
+
+            override fun getHttp(remote: Remote) {
+                callback.getHttp(remote)
+                homeViewModel.noticeBroadcast(resources.getString(R.string.get_http_notice))
+            }
+
+            override fun publishMqtt(remote: Remote) {
+                val type = object : TypeToken<MqttConfig>() {}.type
+                val gson = Gson()
+                val config = gson.fromJson(remote.config, type) as MqttConfig
+                callback.publishMqtt(remote, callback)
+                callback.saveMessageBroadcast(config.content)
+                callback.getMessageBroadcast().let {
+                    Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                        .setAnchorView(binding.add).show()
                 }
-
-                override fun publishMqtt(remote: Remote, callback: Callback) {
-                    callback.publishMqtt(remote, callback)
-                }
-
-
-            }, it)
-        }
-        if (remoteList != null) {
-            adapter?.setData(remoteList)
-        }
+            }
+        }, callback)
+        adapter.setData(remoteList)
         binding.remoteList.adapter = adapter
 
         logger.i("Item navigate: Update remote")
-        adapter?.setOnItemTouchListener {
-            callback?.saveMessageAction(TAG_UPDATE_FRAGMENT)
+        adapter.setOnItemTouchListener {
+            callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
             setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))
-            callback?.let { callback -> AddFragment(callback) }?.let { fragment ->
-                screenNavigate(
-                    fragmentManager,
-                    MainActivity.Navigate.UP,
-                    R.id.mainContainer,
-                    fragment
-                )
-            }
+            screenNavigate(
+                fragmentManager,
+                MainActivity.Navigate.UP,
+                R.id.mainContainer,
+                AddFragment(callback)
+            )
         }
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
-            callback?.saveMessageAction(TAG_ADD_FRAGMENT)
-            callback?.let { callback -> AddFragment(callback) }?.let { fragment ->
-                screenNavigate(
-                    fragmentManager,
-                    MainActivity.Navigate.UP,
-                    R.id.mainContainer,
-                    fragment,
-                    TAG_ADD_FRAGMENT
-                )
-            }
+            callback.saveMessageAction(TAG_ADD_FRAGMENT)
+            screenNavigate(
+                fragmentManager,
+                MainActivity.Navigate.UP,
+                R.id.mainContainer,
+                AddFragment(callback),
+                TAG_ADD_FRAGMENT
+            )
         }
 
         logger.i("Message after type")
-        val message = callback?.updateNotice()
+        val message = callback.updateNotice()
         if (message != "") {
-            if (message != null) {
-                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-                    .setAnchorView(binding.add)
-                    .show()
-            }
+            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+                .setAnchorView(binding.add)
+                .show()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        logger.e("onDestroyView")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logger.e("onDestroy")
+        homeViewModel.notice.observe(viewLifecycleOwner){
+            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                .setAnchorView(binding.add).show()
+        }
     }
 
     /* **********************************************************************
@@ -151,18 +146,19 @@ class HomeFragment(private val callback: Callback) :
     /* **********************************************************************
      * Class
      ********************************************************************** */
-    interface Callback : AddFragment.Callback, Serializable {
-        abstract fun grantBluetoothPermission(remote: Remote, callback: Callback)
-        abstract fun shareBluetooth(remote: Remote, callback: Callback)
-        abstract fun postHttp(remote: Remote)
-        abstract fun publishMqtt(remote: Remote, callback: Callback)
+    interface Callback : AddFragment.Callback{
+        fun grantBluetoothPermission(remote: Remote, callback: Callback)
+        fun shareBluetooth(remote: Remote, callback: Callback)
+        fun postHttp(remote: Remote)
+        fun getHttp(remote: Remote)
+        fun publishMqtt(remote: Remote, callback: Callback)
 
-        abstract fun updateNotice(): String
-        abstract fun saveMessageAction(message: String)
-        abstract fun getMessageAction(): String
-        abstract fun getMessageBroadcast(): String
-        abstract fun saveMessageBroadcast(message: String)
-        abstract fun startAdvertise(advertise: String, message: String)
-        abstract fun stopAdvertise()
+        fun updateNotice(): String
+        fun saveMessageAction(message: String)
+        fun getMessageAction(): String
+        fun getMessageBroadcast(): String
+        fun saveMessageBroadcast(message: String)
+        fun startAdvertise(advertise: String, message: String)
+        fun stopAdvertise()
     }
 }

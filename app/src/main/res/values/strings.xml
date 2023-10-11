@@ -52,6 +52,9 @@
     <string name="get_http_message">Lấy dữ liệu thành công từ</string>
     <string name="post_http_notice">Phát dữ liệu thành công</string>
     <string name="get_http_notice">Lấy dữ liệu thành công</string>
+    <string name="default1_home">Nhà riêng</string>
+    <string name="default2_work">Cơ quan</string>
+    <string name="default0_add">Thêm mới</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

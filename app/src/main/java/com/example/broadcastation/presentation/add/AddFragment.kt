@@ -1,11 +1,12 @@
 package com.example.broadcastation.presentation.add
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ListPopupWindow
 import androidx.annotation.RequiresApi
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.setFragmentResultListener
@@ -20,6 +21,7 @@ import com.example.broadcastation.common.utility.POST_METHOD
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.USER_NAME
+import com.example.broadcastation.common.utility.showCategoryDialog
 import com.example.broadcastation.common.utility.showMenu
 import com.example.broadcastation.databinding.AddFragmentBinding
 import com.example.broadcastation.entity.BluetoothConfig
@@ -29,7 +31,6 @@ import com.example.broadcastation.entity.http.HttpConfig
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
@@ -66,6 +67,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
     private fun saveInputAsRemote(
         name: String,
         describe: String,
+        category: String,
         type: ItemRemoteAdapter.Type,
         callback: HomeFragment.Callback
     ) {
@@ -127,7 +129,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 if (remoteArray.isNotEmpty()) {
                     lastId += remoteArray.last().id
                 }
-                callback.addRemote(Remote(lastId, name, describe, type, icon, config))
+                callback.addRemote(Remote(lastId, name, describe,category, type, icon, config))
             } else if (callback.updateNotice() == TAG_UPDATE_FRAGMENT) {
                 callback.saveMessage(resources.getString(R.string.mes_update_success))
                 val oldRemoteList = callback.getAllRemote()
@@ -135,6 +137,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                     if (it.id == remoteUpdate.id) {
                         it.name = name
                         it.describe = describe
+                        it.category = category
                         it.type = type
                         it.icon = icon
                         it.config = config
@@ -161,36 +164,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
             resources.getStringArray(addViewModel.listCategoryRemote).toMutableList()
         val categoryAdapter =
             ArrayAdapter(requireContext(), R.layout.dropdown_item, listCategoryRemote)
-        binding.categoryNameText.setAdapter(categoryAdapter)
-        binding.categoryNameText.setOnItemClickListener { _, _, i, _ ->
-            if (i == 0) {
-                val builder = AlertDialog.Builder(requireContext())
-                val inflater = layoutInflater
-                builder.setTitle(resources.getString(R.string.add_category_title))
-                val dialogLayout = inflater.inflate(R.layout.layout_add_category, null)
-                val newCategory =
-                    dialogLayout.findViewById<TextInputEditText>(R.id.add_category_text)
-                builder.setView(dialogLayout)
-                builder.setPositiveButton(resources.getString(R.string.ok)) { _, _ ->
-                    if (newCategory.text.isNullOrEmpty()) {
-                        Snackbar.make(
-                            binding.root,
-                            resources.getString(R.string.add_category_fail),
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        listCategoryRemote.add(newCategory.text.toString())
-                        categoryAdapter.notifyDataSetChanged()
-                        Snackbar.make(
-                            binding.root,
-                            "${newCategory.text}: ${resources.getString(R.string.add_category_success)}",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                builder.show()
-            }
-        }
 
         val listRemote = resources.getStringArray(addViewModel.listRemote)
         logger.i("Handle option of remote by typeBroadcast")
@@ -218,12 +191,35 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 }
             }
         }
+        binding.categoryRemoteText.setOnClickListener {
+            showMenu(it, R.menu.category_menu, requireContext())
+        }
         binding.optionRemote.setOnClickListener {
             showMenu(it, R.menu.broadcast_menu, requireContext())
         }
         binding.http.httpMethod.setOnClickListener {
             showMenu(it, R.menu.http_method_menu, requireContext())
         }
+
+        val listPopupWindowButton = binding.categoryRemoteText
+        val listPopupWindow = ListPopupWindow(requireContext(), null, androidx.constraintlayout.widget.R.attr.listPopupWindowStyle)
+
+        listPopupWindow.anchorView = listPopupWindowButton
+
+        val items = resources.getStringArray(R.array.remote_category).toMutableList()
+        val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, items)
+        listPopupWindow.setAdapter(adapter)
+
+        listPopupWindow.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+            listPopupWindow.dismiss()
+            if (position == 0){
+                showCategoryDialog(this, items, categoryAdapter, binding.root)
+            }else{
+                listPopupWindowButton.text = items[position]
+            }
+        }
+
+        listPopupWindowButton.setOnClickListener { listPopupWindow.show() }
 
         logger.i("default remote option")
         binding.local.root.visibility = View.VISIBLE
@@ -243,6 +239,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
             logger.i("Set value of remote item to update form")
             binding.remoteNameText.setText(remoteUpdate.name)
             binding.remoteDescriptionText.setText(remoteUpdate.describe)
+            binding.categoryRemoteText.text = remoteUpdate.category
             val gson = Gson()
             val type: Type
             val config: Any
@@ -281,6 +278,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
             saveInputAsRemote(
                 binding.remoteNameText.text.toString(),
                 binding.remoteDescriptionText.text.toString(),
+                binding.categoryRemoteText.text.toString(),
                 typeBroadcast, callback
             )
         }

@@ -1,11 +1,13 @@
 package com.example.broadcastation.common.utility
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.PopupMenu
@@ -14,6 +16,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
 import com.example.broadcastation.R
 import com.example.broadcastation.presentation.MainActivity
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputEditText
 
 const val ID_REQUEST_KEY = "requestId"
 const val ID_ARG = "id"
@@ -100,5 +104,33 @@ fun showMenu(v: View, @MenuRes menuRes: Int, context: Context) {
         true
     }
     popup.show()
+}
+
+fun showCategoryDialog(fragment: Fragment, listCategoryRemote: MutableList<String>, categoryAdapter: ArrayAdapter<String>, view: View){
+    val builder = AlertDialog.Builder(fragment.context)
+    val inflater = fragment.layoutInflater
+    builder.setTitle(fragment.resources.getString(R.string.add_category_title))
+    val dialogLayout = inflater.inflate(R.layout.layout_add_category, null)
+    val newCategory =
+        dialogLayout.findViewById<TextInputEditText>(R.id.add_category_text)
+    builder.setView(dialogLayout)
+    builder.setPositiveButton(fragment.resources.getString(R.string.ok)) { _, _ ->
+        if (newCategory.text.isNullOrEmpty()) {
+            Snackbar.make(
+                view,
+                fragment.resources.getString(R.string.add_category_fail),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        } else {
+            listCategoryRemote.add(newCategory.text.toString())
+            categoryAdapter.notifyDataSetChanged()
+            Snackbar.make(
+                view,
+                "${newCategory.text}: ${fragment.resources.getString(R.string.add_category_success)}",
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
+    }
+    builder.show()
 }
 

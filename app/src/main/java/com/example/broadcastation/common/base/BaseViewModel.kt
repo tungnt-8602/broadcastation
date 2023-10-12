@@ -18,7 +18,7 @@ abstract class BaseViewModel : ViewModel() {
     internal val logger = Logger.instance
     protected val storage = StorageControl.instance
     internal val local = LocalControl.getInstance()
-    protected val remotee = RemoteControl.instance
+    protected val remote = RemoteControl.instance
 
     private val job = SupervisorJob()
     protected val scope = CoroutineScope(Dispatchers.IO + job)

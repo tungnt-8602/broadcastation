@@ -17,6 +17,7 @@ class Preference {
     private val actionRemote = "$preferenceName:actionRemote"
     private val messageAction = "$preferenceName:messageAction"
     private val messageBroadcast = "$preferenceName:messageBroadcast"
+    private val filterList = "$preferenceName:filterList"
 
     private var shared: SharedPreferences? = null
     private var editor: SharedPreferences.Editor? = null
@@ -101,5 +102,16 @@ class Preference {
             putString(messageBroadcast, message)
             apply()
         }
+    }
+
+    fun setFilterList(type: String) {
+        editor?.apply {
+            putString(filterList, type)
+            apply()
+        }
+    }
+
+    fun getFilterListType(): String? {
+        return shared?.getString(filterList, "")
     }
 }

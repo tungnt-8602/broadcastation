@@ -1,6 +1,8 @@
 package com.example.broadcastation.presentation
 
+import android.content.Context
 import android.os.Build
+import androidx.lifecycle.viewModelScope
 import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
@@ -10,6 +12,8 @@ import com.example.broadcastation.common.utility.POST_URL
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.RetrofitAPI
 import com.example.broadcastation.presentation.home.HomeFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,6 +28,16 @@ class MainViewModel : BaseViewModel() {
     /* **********************************************************************
      * Function
      ********************************************************************** */
+
+    fun mqtt(context: Context, isStart: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (isStart) {
+                remote.createConnect(context)
+            } else {
+                remote.stopConnect()
+            }
+        }
+    }
 
     fun getDeviceName(): String = Build.MODEL
 
@@ -82,10 +96,10 @@ class MainViewModel : BaseViewModel() {
         callback.startAdvertise(remote.name, remote.describe)
     }
 
-    fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
-        logger.i("Mqtt broadcast: ${remote.name}")
-        callback.saveMessageBroadcast(remote.name)
-        remotee.sendMessage(callback.getMessageBroadcast())
+    fun publishMqtt(remoteR: Remote, callback: HomeFragment.Callback) {
+        logger.i("Mqtt broadcast: ${remoteR.name}")
+        callback.saveMessageBroadcast(remoteR.name)
+        remote.sendMessage(callback.getMessageBroadcast())
     }
 
     fun setAdvertiseName(name: String?) {

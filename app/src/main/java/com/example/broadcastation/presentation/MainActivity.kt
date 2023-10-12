@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
+                    viewModel.mqtt(baseContext, true)
                     viewModel.publishMqtt(remote, callback)
                 }
 

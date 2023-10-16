@@ -199,9 +199,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStart() {
+        super.onStart()
         viewModel.saveMessageAction("")
         startService()
-        super.onStart()
     }
 
     override fun onDestroy() {

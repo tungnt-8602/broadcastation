@@ -65,100 +65,111 @@ class HomeFragment(val callback: Callback) :
         logger.i("Recycler view")
         binding.remoteList.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val adapter = ItemRemoteAdapter(callback = object : ItemRemoteAdapter.Callback {
-            override fun shareBluetooth(remote: Remote, callback: Callback) {
-                val isTurnedOn =
-                    activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
-                if (isTurnedOn == true) {
-                    viewModel.shareBluetooth(remote, callback)
-                    return
-                } else {
-                    callback.grantBluetoothPermission(remote, callback)
+        val adapter = callback.let {
+            ItemRemoteAdapter(callback = object : ItemRemoteAdapter.Callback {
+                override fun shareBluetooth(remote: Remote, callback: Callback) {
+                    var isTurnedOn =
+                        activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
+                    if (isTurnedOn == true) {
+                        viewModel.shareBluetooth(remote, callback)
+
+                    } else {
+                        callback.grantBluetoothPermission(remote, callback)
+                    }
                 }
-            }
 
-            override fun postHttp(remote: Remote) {
-                callback.postHttp(remote)
-                homeViewModel.noticeBroadcast(resources.getString(R.string.post_http_notice))
-            }
-
-            override fun getHttp(remote: Remote) {
-                callback.getHttp(remote)
-                homeViewModel.noticeBroadcast(resources.getString(R.string.get_http_notice))
-            }
-
-            override fun publishMqtt(remote: Remote) {
-                val type = object : TypeToken<MqttConfig>() {}.type
-                val gson = Gson()
-                val config = gson.fromJson(remote.config, type) as MqttConfig
-                callback.publishMqtt(remote, callback)
-                callback.saveMessageBroadcast(config.content)
-                callback.getMessageBroadcast().let {
-                    Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                        .setAnchorView(binding.add).show()
+                override fun postHttp(remote: Remote) {
+                    callback.postHttp(remote)
+                    homeViewModel.noticeBroadcast(resources.getString(R.string.post_http_notice))
                 }
+
+                override fun getHttp(remote: Remote) {
+                    callback.getHttp(remote)
+                    homeViewModel.noticeBroadcast(resources.getString(R.string.get_http_notice))
+                }
+
+                override fun publishMqtt(remote: Remote) {
+                    val type = object : TypeToken<MqttConfig>() {}.type
+                    val gson = Gson()
+                    val config = gson.fromJson(remote.config, type) as MqttConfig
+                    callback.publishMqtt(remote, callback)
+                    callback.saveMessageBroadcast(config.content)
+                    callback.getMessageBroadcast().let {
+                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                            .setAnchorView(binding.add).show()
+                    }
+                }
+            }, callback) }
+            adapter.setData(remoteList)
+            binding.remoteList.adapter = adapter
+
+            logger.i("Item navigate: Update remote")
+            adapter.setOnItemTouchListener {
+                callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
+                setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))
+                screenNavigate(
+                    fragmentManager,
+                    MainActivity.Navigate.UP,
+                    R.id.mainContainer,
+                    AddFragment(callback)
+                )
             }
-        }, callback)
-        adapter.setData(remoteList)
-        binding.remoteList.adapter = adapter
 
-        logger.i("Item navigate: Update remote")
-        adapter.setOnItemTouchListener {
-            callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
-            setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))
-            screenNavigate(
-                fragmentManager,
-                MainActivity.Navigate.UP,
-                R.id.mainContainer,
-                AddFragment(callback)
-            )
+            binding.add.setOnClickListener {
+                logger.i("Add button navigate to add fragment")
+                callback.saveMessageAction(TAG_ADD_FRAGMENT)
+                screenNavigate(
+                    fragmentManager,
+                    MainActivity.Navigate.UP,
+                    R.id.mainContainer,
+                    AddFragment(callback),
+                    TAG_ADD_FRAGMENT
+                )
+            }
+
+            logger.i("Message after type")
+            val message = callback.updateNotice()
+            if (message != "") {
+                Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(binding.add)
+                    .show()
+            }
+            homeViewModel.notice.observe(viewLifecycleOwner) {
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(binding.add).show()
+            }
         }
 
-        binding.add.setOnClickListener {
-            logger.i("Add button navigate to add fragment")
-            callback.saveMessageAction(TAG_ADD_FRAGMENT)
-            screenNavigate(
-                fragmentManager,
-                MainActivity.Navigate.UP,
-                R.id.mainContainer,
-                AddFragment(callback),
-                TAG_ADD_FRAGMENT
-            )
+        override fun onDestroyView() {
+            super.onDestroyView()
+            logger.e("onDestroyView")
         }
 
-        logger.i("Message after type")
-        val message = callback.updateNotice()
-        if (message != "") {
-            Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT)
-                .setAnchorView(binding.add)
-                .show()
+        override fun onDestroy() {
+            super.onDestroy()
+            logger.e("onDestroy")
         }
-        homeViewModel.notice.observe(viewLifecycleOwner){
-            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                .setAnchorView(binding.add).show()
-        }
-    }
 
-    /* **********************************************************************
+        /* **********************************************************************
      * Function
      ********************************************************************** */
 
-    /* **********************************************************************
+        /* **********************************************************************
      * Class
      ********************************************************************** */
-    interface Callback : AddFragment.Callback{
-        fun grantBluetoothPermission(remote: Remote, callback: Callback)
-        fun shareBluetooth(remote: Remote, callback: Callback)
-        fun postHttp(remote: Remote)
-        fun getHttp(remote: Remote)
-        fun publishMqtt(remote: Remote, callback: Callback)
+        interface Callback : AddFragment.Callback {
+            fun grantBluetoothPermission(remote: Remote, callback: Callback)
+            fun shareBluetooth(remote: Remote, callback: Callback)
+            fun postHttp(remote: Remote)
+            fun getHttp(remote: Remote)
+            fun publishMqtt(remote: Remote, callback: Callback)
 
-        fun updateNotice(): String
-        fun saveMessageAction(message: String)
-        fun getMessageAction(): String
-        fun getMessageBroadcast(): String
-        fun saveMessageBroadcast(message: String)
-        fun startAdvertise(advertise: String, message: String)
-        fun stopAdvertise()
+            fun updateNotice(): String
+            fun saveMessageAction(message: String)
+            fun getMessageAction(): String
+            fun getMessageBroadcast(): String
+            fun saveMessageBroadcast(message: String)
+            fun startAdvertise(advertise: String, message: String)
+            fun stopAdvertise()
     }
-}
+    }

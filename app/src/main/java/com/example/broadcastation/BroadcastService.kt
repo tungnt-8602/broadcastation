@@ -67,11 +67,11 @@ class BroadcastService : Service() {
         }
 
         private fun bindService(context: Context, intent: Intent) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.startForegroundService(intent)
+//            } else {
                 context.startService(intent)
-            }
+//            }
         }
 
         fun stopService(context: Context) {

@@ -63,6 +63,7 @@ class MainViewModel : BaseViewModel() {
         call?.enqueue(object : Callback<Remote?> {
             override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
                 local.saveMessageBroadcast(response.body()?.describe ?: EMPTY)
+                logger.i("Post Http with body: ${response.body()}")
             }
 
             override fun onFailure(call: Call<Remote?>, t: Throwable) {
@@ -82,6 +83,7 @@ class MainViewModel : BaseViewModel() {
             override fun onResponse(call: Call<Any>, response: Response<Any>) {
                 if (response.body().toString().isNotEmpty()) {
                     local.saveMessageBroadcast("$GET_SUCCESS $GET_URL")
+                    logger.i("Get Http with body: ${response.body()}")
                 }
             }
 
@@ -91,15 +93,16 @@ class MainViewModel : BaseViewModel() {
         })
     }
 
-    fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
-        logger.i("Bluetooth broadcast: ${remote.name}")
-        callback.startAdvertise(remote.name, remote.describe)
+    fun shareBluetooth(remoteR: Remote, callback: HomeFragment.Callback) {
+        logger.i("Bluetooth broadcast: ${remoteR.name}")
+        callback.startAdvertise(remoteR.name, remoteR.describe)
     }
 
-    fun publishMqtt(remoteR: Remote, callback: HomeFragment.Callback) {
+    fun publishMqtt(remoteR: Remote, callback: HomeFragment.Callback, context: Context) {
         logger.i("Mqtt broadcast: ${remoteR.name}")
+        remote.createConnect(context)
         callback.saveMessageBroadcast(remoteR.name)
-        remote.sendMessage(callback.getMessageBroadcast())
+        remote.sendMessage(callback.getMessageBroadcast(), context)
     }
 
     fun setAdvertiseName(name: String?) {

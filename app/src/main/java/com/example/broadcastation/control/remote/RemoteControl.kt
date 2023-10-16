@@ -40,7 +40,7 @@ class RemoteControl {
         mqtt.disconnect()
     }
 
-    fun sendMessage(message: String){
-        mqtt.sendMessage(message)
+    fun sendMessage(message: String, context: Context){
+        mqtt.sendMessage(message, context)
     }
 }

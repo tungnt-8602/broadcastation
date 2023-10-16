@@ -79,7 +79,7 @@ class Mqtt(val callback: Callback) {
         return true
     }
 
-    fun sendMessage(message: String) {
+    fun sendMessage(message: String, context: Context) {
         if (!verify()) {
             return
         }

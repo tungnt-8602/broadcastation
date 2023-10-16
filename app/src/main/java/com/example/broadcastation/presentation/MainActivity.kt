@@ -49,9 +49,9 @@ class MainActivity : AppCompatActivity() {
                 viewModel.setAdvertiseName(advertiseName)
             }
 
-            logger.i("error advertise name")
-            val notify = bundle.getString(BroadcastService.STA_ADVERTISING_ERROR)
-            notify?.let { Snackbar.make(binding.root, "$notify", Snackbar.LENGTH_SHORT).show() }
+//            logger.i("error advertise name")
+//            val notify = bundle.getString(BroadcastService.STA_ADVERTISING_ERROR)
+//            notify?.let { Snackbar.make(binding.root, "$notify", Snackbar.LENGTH_SHORT).show() }
 
         }
     }
@@ -115,9 +115,8 @@ class MainActivity : AppCompatActivity() {
                     viewModel.getHttp()
                 }
 
-                override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
-                    viewModel.mqtt(baseContext, true)
-                    viewModel.publishMqtt(remote, callback)
+                override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback, context: Context) {
+                    viewModel.publishMqtt(remote, callback, context)
                 }
 
                 override fun saveMessageAction(message: String) {
@@ -294,8 +293,8 @@ class MainActivity : AppCompatActivity() {
                         viewModel.getHttp()
                     }
 
-                    override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback) {
-                        viewModel.publishMqtt(remote, callback)
+                    override fun publishMqtt(remote: Remote, callback: HomeFragment.Callback, context: Context) {
+                        viewModel.publishMqtt(remote, callback, context)
                     }
 
                     override fun saveMessageAction(message: String) {

@@ -14,6 +14,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.commit
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.broadcastation.R
 import com.example.broadcastation.presentation.MainActivity
 import com.google.android.material.snackbar.Snackbar
@@ -39,6 +40,8 @@ const val GET_SUCCESS = "Lấy dữ liệu thành công từ"
 
 const val FIRST_STACK = 1
 const val DELAY_TIME_TO_QUIT : Long = 2000
+const val DRAG_DIRS = 0
+const val SWIPE_DIRS = ItemTouchHelper.RIGHT
 
 @SuppressLint("HardwareIds")
 fun Context.getUUID(): String {

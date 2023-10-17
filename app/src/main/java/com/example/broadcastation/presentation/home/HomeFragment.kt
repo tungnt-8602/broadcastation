@@ -12,16 +12,23 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
+import com.example.broadcastation.common.utility.DRAG_DIRS
+import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.ID_ARG
 import com.example.broadcastation.common.utility.ID_REQUEST_KEY
+import com.example.broadcastation.common.utility.POST_URL
+import com.example.broadcastation.common.utility.SWIPE_DIRS
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.databinding.HomeFragmentBinding
 import com.example.broadcastation.entity.BluetoothConfig
+import com.example.broadcastation.entity.Config
 import com.example.broadcastation.entity.MqttConfig
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainActivity
@@ -30,6 +37,7 @@ import com.example.broadcastation.presentation.add.AddFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
 
 
 class HomeFragment(val callback: Callback) :
@@ -40,6 +48,9 @@ class HomeFragment(val callback: Callback) :
     private var fragmentManager: FragmentManager? = null
     private val viewModel: MainViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by viewModels()
+    lateinit var type: Type
+    val gson = Gson()
+    private lateinit var config: Config
 
     /* **********************************************************************
      * Life Cycle
@@ -71,45 +82,84 @@ class HomeFragment(val callback: Callback) :
             override fun shareBluetooth(remote: Remote, callback: Callback) {
                 val isTurnedOn =
                     activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
-                if (isTurnedOn == true) {
-                    viewModel.shareBluetooth(remote, callback)
-                    val type = object : TypeToken<BluetoothConfig>() {}.type
-                    val gson = Gson()
-                    val config = gson.fromJson(remote.config, type) as BluetoothConfig
-                    callback.saveMessageBroadcast(config.content)
-                    callback.getMessageBroadcast().let {
-                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                            .setAnchorView(binding.add).show()
+                try {
+                    if (isTurnedOn == true) {
+                        viewModel.shareBluetooth(remote, callback)
+                        type = object : TypeToken<BluetoothConfig>() {}.type
+                        config = gson.fromJson(remote.config, type)
+                        callback.saveMessageBroadcast((config as BluetoothConfig).content)
+                        callback.getMessageBroadcast().let {
+                            logger.i("Share ble")
+                            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                                .setAnchorView(binding.add).show()
+                        }
+                    } else {
+                        callback.grantBluetoothPermission(remote, callback, binding.add)
                     }
-                } else {
-                    callback.grantBluetoothPermission(remote, callback)
+                } catch (e: Exception) {
+                    logger.w(e.message ?: "Share bluetooth")
                 }
             }
 
             override fun postHttp(remote: Remote) {
                 callback.postHttp(remote)
-                homeViewModel.noticeBroadcast(resources.getString(R.string.post_http_notice))
+                homeViewModel.noticeBroadcast("${resources.getString(homeViewModel.noticePostHttp)} $POST_URL")
             }
 
             override fun getHttp(remote: Remote) {
                 callback.getHttp(remote)
-                homeViewModel.noticeBroadcast(resources.getString(R.string.get_http_notice))
+                homeViewModel.noticeBroadcast("${resources.getString(homeViewModel.noticeGetHttp)} $GET_URL")
             }
 
             override fun publishMqtt(remote: Remote) {
-                val type = object : TypeToken<MqttConfig>() {}.type
-                val gson = Gson()
-                val config = gson.fromJson(remote.config, type) as MqttConfig
-                callback.publishMqtt(remote, callback, requireContext())
-                callback.saveMessageBroadcast(config.content)
-                callback.getMessageBroadcast().let {
-                    Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                        .setAnchorView(binding.add).show()
+                try {
+                    type = object : TypeToken<MqttConfig>() {}.type
+                    config = gson.fromJson(remote.config, type)
+                    callback.publishMqtt(remote, callback, requireContext())
+                    callback.saveMessageBroadcast((config as MqttConfig).content)
+                    callback.getMessageBroadcast().let {
+                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                            .setAnchorView(binding.add).show()
+                    }
+                } catch (e: Exception) {
+                    logger.w(e.message ?: "Publish Mqtt")
                 }
+
             }
         }, callback)
         adapter.setData(remoteList)
         binding.remoteList.adapter = adapter
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(DRAG_DIRS, SWIPE_DIRS) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                val deletedRemote: Remote = remoteList[position]
+                remoteList.removeAt(position)
+                callback.updateRemote(remoteList)
+                adapter.setData(remoteList)
+
+                // below line is to display our snackbar with action.
+                Snackbar.make(
+                    binding.root,
+                    "${resources.getString(homeViewModel.deleteRemote)} ${deletedRemote.name}",
+                    Snackbar.LENGTH_LONG
+                )
+                    .setAnchorView(binding.add)
+                    .setAction(homeViewModel.undo) {
+                        remoteList.add(position, deletedRemote)
+                        callback.updateRemote(remoteList)
+                        adapter.setData(remoteList)
+                    }.show()
+            }
+        }).attachToRecyclerView(binding.remoteList)
 
         logger.i("Item navigate: Update remote")
         adapter.setOnItemTouchListener {
@@ -142,7 +192,7 @@ class HomeFragment(val callback: Callback) :
                 .setAnchorView(binding.add)
                 .show()
         }
-        homeViewModel.notice.observe(viewLifecycleOwner){
+        homeViewModel.notice.observe(viewLifecycleOwner) {
             Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
                 .setAnchorView(binding.add).show()
         }
@@ -155,8 +205,8 @@ class HomeFragment(val callback: Callback) :
     /* **********************************************************************
      * Class
      ********************************************************************** */
-    interface Callback : AddFragment.Callback{
-        fun grantBluetoothPermission(remote: Remote, callback: Callback)
+    interface Callback : AddFragment.Callback {
+        fun grantBluetoothPermission(remote: Remote, callback: Callback, view: View)
         fun shareBluetooth(remote: Remote, callback: Callback)
         fun postHttp(remote: Remote)
         fun getHttp(remote: Remote)

@@ -20,11 +20,12 @@
             android:layout_height="match_parent"
             android:background="?android:selectableItemBackground"
             android:padding="@dimen/space_large"
+            android:contentDescription="@string/backToHome"
             android:src="@drawable/ic_back"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/add_fragment"
+            android:id="@+id/title"
             style="@style/Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

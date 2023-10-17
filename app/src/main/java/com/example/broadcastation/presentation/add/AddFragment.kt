@@ -21,13 +21,16 @@ import com.example.broadcastation.common.utility.POST_METHOD
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.USER_NAME
+import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.common.utility.showCategoryDialog
 import com.example.broadcastation.common.utility.showMenu
 import com.example.broadcastation.databinding.AddFragmentBinding
 import com.example.broadcastation.entity.BluetoothConfig
+import com.example.broadcastation.entity.Config
 import com.example.broadcastation.entity.MqttConfig
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.HttpConfig
+import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 import com.google.android.material.snackbar.Snackbar
@@ -35,6 +38,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
+@Suppress("DEPRECATION")
 class AddFragment(private val callback: HomeFragment.Callback) :
     BaseFragment<AddFragmentBinding>(AddFragmentBinding::inflate) {
     /* **********************************************************************
@@ -43,6 +47,9 @@ class AddFragment(private val callback: HomeFragment.Callback) :
     private var typeBroadcast: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
     private lateinit var remoteUpdate: Remote
     private val addViewModel: AddViewModel by viewModels()
+    val gson = Gson()
+    lateinit var type: Type
+    private lateinit var config: Config
 
     /* **********************************************************************
      * Life Cycle
@@ -145,7 +152,12 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 }
                 callback.updateRemote(oldRemoteList)
             }
-            parentFragmentManager.popBackStack()
+            screenNavigate(
+                fragmentManager,
+                MainActivity.Navigate.DOWN,
+                R.id.mainContainer,
+                HomeFragment(callback)
+            )
         }
     }
 
@@ -156,6 +168,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         binding.backToHome.setOnClickListener {
             logger.i("Back button navigate to home fragment")
             callback.saveMessage("")
+            callback.saveMessageBroadcast("")
             parentFragmentManager.popBackStack()
         }
 
@@ -163,7 +176,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         val listCategoryRemote =
             resources.getStringArray(addViewModel.listCategoryRemote).toMutableList()
         val categoryAdapter =
-            ArrayAdapter(requireContext(), R.layout.dropdown_item, listCategoryRemote)
+            ArrayAdapter(requireContext(), addViewModel.dropdownItem, listCategoryRemote)
 
         val listRemote = resources.getStringArray(addViewModel.listRemote)
         logger.i("Handle option of remote by typeBroadcast")
@@ -192,30 +205,25 @@ class AddFragment(private val callback: HomeFragment.Callback) :
             }
         }
         binding.categoryRemoteText.setOnClickListener {
-            showMenu(it, R.menu.category_menu, requireContext())
+            showMenu(it, addViewModel.menuCategory, requireContext())
         }
         binding.optionRemote.setOnClickListener {
-            showMenu(it, R.menu.broadcast_menu, requireContext())
+            showMenu(it, addViewModel.menuBroadcast, requireContext())
         }
         binding.http.httpMethod.setOnClickListener {
-            showMenu(it, R.menu.http_method_menu, requireContext())
+            showMenu(it, addViewModel.menuHttpMethod, requireContext())
         }
 
         val listPopupWindowButton = binding.categoryRemoteText
         val listPopupWindow = ListPopupWindow(requireContext(), null, androidx.constraintlayout.widget.R.attr.listPopupWindowStyle)
-
         listPopupWindow.anchorView = listPopupWindowButton
-
-        val items = resources.getStringArray(R.array.remote_category).toMutableList()
-        val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_item, items)
-        listPopupWindow.setAdapter(adapter)
-
+        listPopupWindow.setAdapter(categoryAdapter)
         listPopupWindow.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
             listPopupWindow.dismiss()
             if (position == 0){
-                showCategoryDialog(this, items, categoryAdapter, binding.root)
+                showCategoryDialog(this, listCategoryRemote, categoryAdapter, binding.root)
             }else{
-                listPopupWindowButton.text = items[position]
+                listPopupWindowButton.text = listCategoryRemote[position]
             }
         }
 
@@ -233,42 +241,44 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         setFragmentResultListener(ID_REQUEST_KEY) { _, bundle ->
             val id = bundle.getInt(ID_ARG)
             logger.i("Set title when update")
-            binding.addFragment.text = resources.getString(R.string.update_title)
+            binding.title.text = resources.getString(addViewModel.updateTitle)
             logger.i("Find remote by id")
             remoteUpdate = callback.findRemoteById(id)
             logger.i("Set value of remote item to update form")
             binding.remoteNameText.setText(remoteUpdate.name)
             binding.remoteDescriptionText.setText(remoteUpdate.describe)
             binding.categoryRemoteText.text = remoteUpdate.category
-            val gson = Gson()
-            val type: Type
-            val config: Any
-            when (remoteUpdate.type) {
-                ItemRemoteAdapter.Type.BLUETOOTH -> {
-                    binding.optionRemote.text = listRemote[0]
-                    type = object : TypeToken<BluetoothConfig>() {}.type
-                    config = gson.fromJson(remoteUpdate.config, type) as BluetoothConfig
-                    binding.local.localContentText.setText(config.content)
-                }
 
-                ItemRemoteAdapter.Type.HTTP -> {
-                    binding.optionRemote.text = listRemote[1]
-                    type = object : TypeToken<HttpConfig>() {}.type
-                    config = gson.fromJson(remoteUpdate.config, type) as HttpConfig
-                    binding.http.httpMethod.text = config.method.toString()
-                    binding.http.httpUrlText.setText(config.url)
-                    binding.http.httpContentText.setText(config.content)
-                }
+            try {
+                when (remoteUpdate.type) {
+                    ItemRemoteAdapter.Type.BLUETOOTH -> {
+                        binding.optionRemote.text = listRemote[0]
+                        type = object : TypeToken<BluetoothConfig>() {}.type
+                        config = gson.fromJson(remoteUpdate.config, type)
+                        binding.local.localContentText.setText((config as BluetoothConfig).content)
+                    }
 
-                ItemRemoteAdapter.Type.MQTT -> {
-                    binding.optionRemote.text = listRemote[2]
-                    type = object : TypeToken<MqttConfig>() {}.type
-                    config = gson.fromJson(remoteUpdate.config, type) as MqttConfig
-                    binding.mqtt.domainText.setText(config.domain)
-                    binding.mqtt.portText.setText(config.port)
-                    binding.mqtt.channelText.setText((config.channel))
-                    binding.mqtt.mqttContentText.setText(config.content)
+                    ItemRemoteAdapter.Type.HTTP -> {
+                        binding.optionRemote.text = listRemote[1]
+                        type = object : TypeToken<HttpConfig>() {}.type
+                        config = gson.fromJson(remoteUpdate.config, type)
+                        binding.http.httpMethod.text = (config as HttpConfig).method.toString()
+                        binding.http.httpUrlText.setText((config as HttpConfig).url)
+                        binding.http.httpContentText.setText((config as HttpConfig).content)
+                    }
+
+                    ItemRemoteAdapter.Type.MQTT -> {
+                        binding.optionRemote.text = listRemote[2]
+                        type = object : TypeToken<MqttConfig>() {}.type
+                        config = gson.fromJson(remoteUpdate.config, type)
+                        binding.mqtt.domainText.setText((config as MqttConfig).domain)
+                        binding.mqtt.portText.setText((config as MqttConfig).port)
+                        binding.mqtt.channelText.setText(((config as MqttConfig).channel))
+                        binding.mqtt.mqttContentText.setText((config as MqttConfig).content)
+                    }
                 }
+            }catch (e: Exception){
+                logger.w(e.message ?: "Broadcasting")
             }
         }
 

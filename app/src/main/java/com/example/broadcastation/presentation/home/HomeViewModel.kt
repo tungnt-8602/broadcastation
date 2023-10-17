@@ -2,6 +2,7 @@ package com.example.broadcastation.presentation.home
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
@@ -18,6 +19,11 @@ class HomeViewModel : BaseViewModel() {
      * Variable
      ********************************************************************** */
     val notice = MutableLiveData<String>()
+    val undo = R.string.undo
+    val deleteRemote = R.string.delete_remote
+
+    val noticeGetHttp = R.string.get_http_notice
+    val noticePostHttp = R.string.post_http_notice
 
     /* **********************************************************************
      * Function

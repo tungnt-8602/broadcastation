@@ -3,6 +3,7 @@ package com.example.broadcastation.presentation
 import android.content.Context
 import android.os.Build
 import androidx.lifecycle.viewModelScope
+import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
@@ -24,6 +25,8 @@ class MainViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
+    val noticeQuit = R.string.quit_noti
+    val colorStatusBar = R.color.scc_300
 
     /* **********************************************************************
      * Function

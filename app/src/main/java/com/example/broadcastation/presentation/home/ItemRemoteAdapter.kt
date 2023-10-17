@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.http.HttpConfig
@@ -52,9 +53,9 @@ class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFr
                     val type = object : TypeToken<HttpConfig>() {}.type
                     val gson = Gson()
                     val config = gson.fromJson(data[position].config, type) as HttpConfig
-                    if(config.method == HttpMethod.POST){
+                    if (config.method == HttpMethod.POST) {
                         callback.postHttp(data[position])
-                    }else{
+                    } else {
                         callback.getHttp(data[position])
                     }
                 }
@@ -66,7 +67,7 @@ class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFr
         }
 
         holder.binding.root.setOnClickListener {
-            onItemTouchListener?.let { it1 -> it1(data[position]) }
+            onItemTouchListener?.let { touch -> touch(data[position]) }
         }
 
     }

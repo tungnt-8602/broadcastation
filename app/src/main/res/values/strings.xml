@@ -50,11 +50,14 @@
     <string name="empty_http_url">Đường dẫn chưa hợp lệ, hãy nhập đầy đủ</string>
     <string name="empty_mqtt_domain_channel">Domain hoặc kênh chưa hợp lệ, hãy nhập lại</string>
     <string name="get_http_message">Lấy dữ liệu thành công từ</string>
-    <string name="post_http_notice">Phát dữ liệu thành công</string>
-    <string name="get_http_notice">Lấy dữ liệu thành công</string>
+    <string name="post_http_notice">Phát dữ liệu thành công đến</string>
+    <string name="get_http_notice">Lấy dữ liệu thành công từ</string>
     <string name="default1_home">Nhà riêng</string>
     <string name="default2_work">Cơ quan</string>
     <string name="default0_add">Thêm mới</string>
+    <string name="delete_remote">Đã xóa điều khiển</string>
+    <string name="undo">Hoàn tác</string>
+    <string name="backToHome">Quay lại</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

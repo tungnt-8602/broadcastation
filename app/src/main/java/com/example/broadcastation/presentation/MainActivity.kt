@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.StrictMode
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -21,9 +22,13 @@ import com.example.broadcastation.common.utility.FIRST_STACK
 import com.example.broadcastation.common.utility.TAG_HOME_FRAGMENT
 import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.ActivityMainBinding
+import com.example.broadcastation.entity.BluetoothConfig
+import com.example.broadcastation.entity.Config
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
@@ -48,11 +53,6 @@ class MainActivity : AppCompatActivity() {
             if (!advertiseName.isNullOrEmpty()) {
                 viewModel.setAdvertiseName(advertiseName)
             }
-
-//            logger.i("error advertise name")
-//            val notify = bundle.getString(BroadcastService.STA_ADVERTISING_ERROR)
-//            notify?.let { Snackbar.make(binding.root, "$notify", Snackbar.LENGTH_SHORT).show() }
-
         }
     }
 
@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         logger.i("Inflate home view")
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        window.statusBarColor = getColor(R.color.scc_300)
+        window.statusBarColor = getColor(viewModel.colorStatusBar)
 
         logger.i("Add HomeFragment")
         val fragmentManager = supportFragmentManager
@@ -98,9 +98,10 @@ class MainActivity : AppCompatActivity() {
 
                 override fun grantBluetoothPermission(
                     remote: Remote,
-                    callback: HomeFragment.Callback
-                ) {
-                    grantPermission(remote, callback)
+                    callback: HomeFragment.Callback,
+                    view: View
+                ){
+                    grantPermission(remote, callback, view)
                 }
 
                 override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {
@@ -184,7 +185,7 @@ class MainActivity : AppCompatActivity() {
             doubleBackToExitPressedOnce = true
             Snackbar.make(
                 binding.root,
-                resources.getString(R.string.quit_noti),
+                resources.getString(viewModel.noticeQuit),
                 Snackbar.LENGTH_SHORT
             ).show()
 
@@ -200,6 +201,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         viewModel.saveMessageAction("")
+        viewModel.saveMessageBroadcast("")
         startService()
     }
 
@@ -216,7 +218,7 @@ class MainActivity : AppCompatActivity() {
     /* **********************************************************************
      * Function
      ********************************************************************** */
-    fun grantPermission(remote: Remote, callback: HomeFragment.Callback) {
+    fun grantPermission(remote: Remote, callback: HomeFragment.Callback, view: View) {
         permission.registerCallback(MainActivity::class.java.name,
             object : PermissionControl.PermissionCallback {
                 override fun grantSuccess() {
@@ -225,6 +227,15 @@ class MainActivity : AppCompatActivity() {
                         getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
                     if (isTurnedOn == true) {
                         viewModel.shareBluetooth(remote, callback)
+                        val type = object : TypeToken<BluetoothConfig>() {}.type
+                        val gson = Gson()
+                        val config: Config = gson.fromJson(remote.config, type)
+                        callback.saveMessageBroadcast((config as BluetoothConfig).content)
+                        callback.getMessageBroadcast().let {
+                            logger.i("Share ble")
+                            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
+                                .setAnchorView(view).show()
+                        }
                         return
                     }
                 }
@@ -275,9 +286,10 @@ class MainActivity : AppCompatActivity() {
 
                     override fun grantBluetoothPermission(
                         remote: Remote,
-                        callback: HomeFragment.Callback
-                    ) {
-                        grantPermission(remote, callback)
+                        callback: HomeFragment.Callback,
+                        view: View
+                    ){
+                        grantPermission(remote, callback, view)
                     }
 
                     override fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback) {

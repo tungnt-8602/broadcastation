@@ -1,6 +1,5 @@
-package com.example.broadcastation.entity.http
+package com.example.broadcastation.entity.config
 
-import com.example.broadcastation.entity.Config
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 
 data class HttpConfig(

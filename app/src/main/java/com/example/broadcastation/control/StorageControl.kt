@@ -18,5 +18,6 @@ class StorageControl : BaseControl() {
     companion object {
         var instance = StorageControl()
     }
+
     var deviceId = ""
 }

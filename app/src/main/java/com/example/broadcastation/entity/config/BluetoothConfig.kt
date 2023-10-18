@@ -1,4 +1,4 @@
-package com.example.broadcastation.entity
+package com.example.broadcastation.entity.config
 
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
 

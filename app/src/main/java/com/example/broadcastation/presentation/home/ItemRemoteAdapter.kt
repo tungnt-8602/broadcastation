@@ -4,10 +4,9 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.entity.http.HttpConfig
+import com.example.broadcastation.entity.config.HttpConfig
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -69,7 +68,6 @@ class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFr
         holder.binding.root.setOnClickListener {
             onItemTouchListener?.let { touch -> touch(data[position]) }
         }
-
     }
 
     /* **********************************************************************

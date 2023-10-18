@@ -70,7 +70,7 @@ class BroadcastService : Service() {
 //            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                context.startForegroundService(intent)
 //            } else {
-                context.startService(intent)
+            context.startService(intent)
 //            }
         }
 

@@ -38,7 +38,7 @@ class Preference {
         val gson = Gson()
         val json = gson.toJson(remote)
         var pastList = shared?.getString(addRemote, "")
-        if(!pastList.isNullOrEmpty()){
+        if (!pastList.isNullOrEmpty()) {
             pastList += ","
         }
         editor?.apply {
@@ -52,20 +52,19 @@ class Preference {
         val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
         val json = gson.toJson(remotes, type)
         editor?.apply {
-            putString(addRemote, json.replace("[","").replace("]",""))
+            putString(addRemote, json.replace("[", "").replace("]", ""))
             apply()
         }
     }
 
-    fun getAllRemotes() : MutableList<Remote>{
+    fun getAllRemotes(): MutableList<Remote> {
         val listRemote: MutableList<Remote>
         val serializedObject: String? = shared?.getString(addRemote, null)
         if (serializedObject != null) {
             val gson = Gson()
             val type: Type = object : TypeToken<MutableList<Remote?>?>() {}.type
             listRemote = gson.fromJson("[$serializedObject]", type) as MutableList<Remote>
-        }
-        else{
+        } else {
             return mutableListOf()
         }
         return listRemote
@@ -86,8 +85,8 @@ class Preference {
         return shared?.getString(messageAction, "")
     }
 
-    fun saveMessageAction(message: String){
-        editor?.apply{
+    fun saveMessageAction(message: String) {
+        editor?.apply {
             putString(messageAction, message)
             apply()
         }
@@ -97,8 +96,8 @@ class Preference {
         return shared?.getString(messageBroadcast, "")
     }
 
-    fun saveMessageBroadcast(message: String){
-        editor?.apply{
+    fun saveMessageBroadcast(message: String) {
+        editor?.apply {
             putString(messageBroadcast, message)
             apply()
         }

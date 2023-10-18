@@ -2,7 +2,7 @@ package com.example.broadcastation.control
 
 import android.content.Context
 import com.example.broadcastation.common.logger.Logger
-import com.example.broadcastation.entity.MqttConfig
+import com.example.broadcastation.entity.config.MqttConfig
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken
@@ -91,9 +91,9 @@ class Mqtt(val callback: Callback) {
             }
             val json = gson.toJson(jsonObject)
             val message = MqttMessage(json.toByteArray())
-            try{
+            try {
                 it.publish(topic, message)
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 callback.connectFail(e.message ?: "")
             }
         }

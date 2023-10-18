@@ -3,6 +3,7 @@ package com.example.broadcastation.presentation
 import android.content.Context
 import android.os.Build
 import androidx.lifecycle.viewModelScope
+import com.example.broadcastation.BroadcastService
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.EMPTY
@@ -11,7 +12,7 @@ import com.example.broadcastation.common.utility.GET_SUCCESS
 import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.POST_URL
 import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.entity.http.RetrofitAPI
+import com.example.broadcastation.entity.http_api.RetrofitAPI
 import com.example.broadcastation.presentation.home.HomeFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,10 +29,11 @@ class MainViewModel : BaseViewModel() {
     val noticeQuit = R.string.quit_noti
     val colorStatusBar = R.color.scc_300
 
+    val deviceNoticeId = mutableMapOf<String, Int>()
+
     /* **********************************************************************
      * Function
      ********************************************************************** */
-
     fun mqtt(context: Context, isStart: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isStart) {
@@ -40,6 +42,10 @@ class MainViewModel : BaseViewModel() {
                 remote.stopConnect()
             }
         }
+    }
+
+    fun getDeviceMessage(data: String): BroadcastService.AdvertiseData? {
+        return gson.fromJson(data, BroadcastService.AdvertiseData::class.java)
     }
 
     fun getDeviceName(): String = Build.MODEL

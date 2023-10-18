@@ -68,11 +68,11 @@ class LocalControl private constructor() : BaseControl() {
         preference.saveMessageBroadcast(message)
     }
 
-    fun getFilterListType() : String{
+    fun getFilterListType(): String {
         return preference.getFilterListType() ?: "null"
     }
 
-    fun saveFilterListType(type: String){
+    fun saveFilterListType(type: String) {
         preference.setFilterList(type)
     }
 }

@@ -1,7 +1,6 @@
 package com.example.broadcastation
 
 import android.app.Application
-import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.control.LocalControl
 
 class MyApplication : Application(){
@@ -16,8 +15,6 @@ class MyApplication : Application(){
     /* **********************************************************************
      * Function
      ********************************************************************** */
-
-
     private fun initControl() {
         LocalControl.getInstance().apply {
             setContext(applicationContext)

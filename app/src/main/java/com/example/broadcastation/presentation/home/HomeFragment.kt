@@ -27,9 +27,9 @@ import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.databinding.HomeFragmentBinding
-import com.example.broadcastation.entity.BluetoothConfig
-import com.example.broadcastation.entity.Config
-import com.example.broadcastation.entity.MqttConfig
+import com.example.broadcastation.entity.config.BluetoothConfig
+import com.example.broadcastation.entity.config.Config
+import com.example.broadcastation.entity.config.MqttConfig
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
@@ -55,7 +55,6 @@ class HomeFragment(val callback: Callback) :
     /* **********************************************************************
      * Life Cycle
      ********************************************************************** */
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("SuspiciousIndentation")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

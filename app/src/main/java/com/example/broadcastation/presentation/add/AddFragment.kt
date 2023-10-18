@@ -25,11 +25,11 @@ import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.common.utility.showCategoryDialog
 import com.example.broadcastation.common.utility.showMenu
 import com.example.broadcastation.databinding.AddFragmentBinding
-import com.example.broadcastation.entity.BluetoothConfig
-import com.example.broadcastation.entity.Config
-import com.example.broadcastation.entity.MqttConfig
+import com.example.broadcastation.entity.config.BluetoothConfig
+import com.example.broadcastation.entity.config.Config
+import com.example.broadcastation.entity.config.MqttConfig
 import com.example.broadcastation.entity.Remote
-import com.example.broadcastation.entity.http.HttpConfig
+import com.example.broadcastation.entity.config.HttpConfig
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.example.broadcastation.presentation.home.ItemRemoteAdapter
@@ -67,6 +67,11 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
     }
 
+    override fun onStop() {
+        callback.saveMessageAction("")
+        callback.saveMessageBroadcast("")
+        super.onStop()
+    }
 
     /* ***********************************************************************
      * Function
@@ -136,7 +141,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 if (remoteArray.isNotEmpty()) {
                     lastId += remoteArray.last().id
                 }
-                callback.addRemote(Remote(lastId, name, describe,category, type, icon, config))
+                callback.addRemote(Remote(lastId, name, describe, category, type, icon, config))
             } else if (callback.updateNotice() == TAG_UPDATE_FRAGMENT) {
                 callback.saveMessage(resources.getString(R.string.mes_update_success))
                 val oldRemoteList = callback.getAllRemote()
@@ -215,14 +220,18 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
 
         val listPopupWindowButton = binding.categoryRemoteText
-        val listPopupWindow = ListPopupWindow(requireContext(), null, androidx.constraintlayout.widget.R.attr.listPopupWindowStyle)
+        val listPopupWindow = ListPopupWindow(
+            requireContext(),
+            null,
+            androidx.constraintlayout.widget.R.attr.listPopupWindowStyle
+        )
         listPopupWindow.anchorView = listPopupWindowButton
         listPopupWindow.setAdapter(categoryAdapter)
         listPopupWindow.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
             listPopupWindow.dismiss()
-            if (position == 0){
+            if (position == 0) {
                 showCategoryDialog(this, listCategoryRemote, categoryAdapter, binding.root)
-            }else{
+            } else {
                 listPopupWindowButton.text = listCategoryRemote[position]
             }
         }
@@ -277,7 +286,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                         binding.mqtt.mqttContentText.setText((config as MqttConfig).content)
                     }
                 }
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 logger.w(e.message ?: "Broadcasting")
             }
         }

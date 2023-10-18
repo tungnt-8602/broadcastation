@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.broadcastation.common.logger.Logger
 import com.example.broadcastation.control.Mqtt
 import com.example.broadcastation.control.StorageControl
-import com.example.broadcastation.entity.MqttConfig
+import com.example.broadcastation.entity.config.MqttConfig
 import com.google.gson.Gson
 
 class RemoteControl {
@@ -13,14 +13,21 @@ class RemoteControl {
      ********************************************************************** */
     private val logger = Logger.instance
     private val gson = Gson()
+
     companion object {
         val instance = RemoteControl()
     }
+
     private val storage = StorageControl.instance
-    private val mqtt = Mqtt(callback = object : Mqtt.Callback{
+    private val mqtt = Mqtt(callback = object : Mqtt.Callback {
         override fun getMqttData(): MqttConfig {
             return MqttConfig(
-                storage.userName, storage.passWord, storage.domainMqtt, storage.port, storage.channel, storage.content
+                storage.userName,
+                storage.passWord,
+                storage.domainMqtt,
+                storage.port,
+                storage.channel,
+                storage.content
             )
         }
 
@@ -40,7 +47,7 @@ class RemoteControl {
         mqtt.disconnect()
     }
 
-    fun sendMessage(message: String, context: Context){
+    fun sendMessage(message: String, context: Context) {
         mqtt.sendMessage(message, context)
     }
 }

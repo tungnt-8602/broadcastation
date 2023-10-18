@@ -8,7 +8,6 @@ class AddViewModel : BaseViewModel() {
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-
     val notice = MutableLiveData<String>()
 
     val listRemote = R.array.remote_menu
@@ -25,10 +24,9 @@ class AddViewModel : BaseViewModel() {
      * Function
      ********************************************************************** */
 
-    fun noticeVerify(newNotice: String){
+    fun noticeVerify(newNotice: String) {
         notice.value = newNotice
     }
-
 
     /* **********************************************************************
      * Class

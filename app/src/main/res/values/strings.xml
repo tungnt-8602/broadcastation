@@ -58,6 +58,7 @@
     <string name="delete_remote">Đã xóa điều khiển</string>
     <string name="undo">Hoàn tác</string>
     <string name="backToHome">Quay lại</string>
+    <string name="def_return">Trở về mặc định</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>
@@ -67,6 +68,7 @@
 
     <string-array name="remote_category">
         <item>Thêm mới</item>
+        <item>Trở về mặc định</item>
         <item>Nhà riêng</item>
         <item>Cơ quan</item>
     </string-array>

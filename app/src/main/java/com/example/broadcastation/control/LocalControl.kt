@@ -3,6 +3,7 @@ package com.example.broadcastation.control
 import android.content.Context
 import com.example.broadcastation.common.base.BaseControl
 import com.example.broadcastation.entity.Remote
+import com.example.broadcastation.presentation.home.HomeViewModel
 
 class LocalControl private constructor() : BaseControl() {
     /* **********************************************************************
@@ -68,11 +69,19 @@ class LocalControl private constructor() : BaseControl() {
         preference.saveMessageBroadcast(message)
     }
 
-    fun getFilterListType(): String {
-        return preference.getFilterListType() ?: "null"
+    fun getCategoryList(): MutableList<String> {
+        return preference.getCategoryList()
     }
 
-    fun saveFilterListType(type: String) {
-        preference.setFilterList(type)
+    fun saveCategoryList(categories: MutableList<String>) {
+        preference.setCategoryList(categories)
+    }
+
+    fun getSortType(): HomeViewModel.SortType {
+        return preference.getSortType()
+    }
+
+    fun saveSortType(type: HomeViewModel.SortType) {
+        preference.saveSortType(type)
     }
 }

@@ -67,12 +67,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
     }
 
-    override fun onStop() {
-        callback.saveMessageAction("")
-        callback.saveMessageBroadcast("")
-        super.onStop()
-    }
-
     /* ***********************************************************************
      * Function
      ********************************************************************** */
@@ -157,12 +151,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 }
                 callback.updateRemote(oldRemoteList)
             }
-            screenNavigate(
-                fragmentManager,
-                MainActivity.Navigate.DOWN,
-                R.id.mainContainer,
-                HomeFragment(callback)
-            )
         }
     }
 
@@ -178,10 +166,13 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
 
         logger.i("Handle dropdown menu ")
-        val listCategoryRemote =
-            resources.getStringArray(addViewModel.listCategoryRemote).toMutableList()
+        var listCategoryRemote = addViewModel.getCategoryList()
+        if(listCategoryRemote.isEmpty()){
+            listCategoryRemote = resources.getStringArray(addViewModel.listCategoryRemote).toMutableList()
+        }
         val categoryAdapter =
             ArrayAdapter(requireContext(), addViewModel.dropdownItem, listCategoryRemote)
+        addViewModel.saveCategoryList(listCategoryRemote)
 
         val listRemote = resources.getStringArray(addViewModel.listRemote)
         logger.i("Handle option of remote by typeBroadcast")
@@ -209,9 +200,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 }
             }
         }
-        binding.categoryRemoteText.setOnClickListener {
-            showMenu(it, addViewModel.menuCategory, requireContext())
-        }
         binding.optionRemote.setOnClickListener {
             showMenu(it, addViewModel.menuBroadcast, requireContext())
         }
@@ -229,10 +217,24 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         listPopupWindow.setAdapter(categoryAdapter)
         listPopupWindow.setOnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
             listPopupWindow.dismiss()
-            if (position == 0) {
-                showCategoryDialog(this, listCategoryRemote, categoryAdapter, binding.root)
-            } else {
-                listPopupWindowButton.text = listCategoryRemote[position]
+            when(position){
+                0-> {
+                    showCategoryDialog(this, listCategoryRemote, categoryAdapter, binding.saveRemote, addViewModel)
+                }
+                1-> {
+                    listCategoryRemote.clear()
+                    listCategoryRemote.addAll(resources.getStringArray(addViewModel.listCategoryRemote).toMutableList())
+                    addViewModel.saveCategoryList(listCategoryRemote)
+                    categoryAdapter.notifyDataSetChanged()
+                    Snackbar.make(
+                        binding.root,
+                        resources.getString(R.string.def_return),
+                        Snackbar.LENGTH_SHORT
+                    )
+                        .setAnchorView(binding.saveRemote)
+                        .show()
+                }
+                else -> listPopupWindowButton.text = listCategoryRemote[position]
             }
         }
 
@@ -299,6 +301,12 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 binding.remoteDescriptionText.text.toString(),
                 binding.categoryRemoteText.text.toString(),
                 typeBroadcast, callback
+            )
+            screenNavigate(
+                fragmentManager,
+                MainActivity.Navigate.DOWN,
+                R.id.mainContainer,
+                HomeFragment(callback)
             )
         }
     }

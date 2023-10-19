@@ -28,6 +28,12 @@ class AddViewModel : BaseViewModel() {
         notice.value = newNotice
     }
 
+    fun getCategoryList() = local.getCategoryList()
+
+    fun saveCategoryList(filters: MutableList<String>){
+        local.saveCategoryList(filters)
+    }
+
     /* **********************************************************************
      * Class
      ********************************************************************** */

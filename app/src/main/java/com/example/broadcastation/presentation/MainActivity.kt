@@ -1,20 +1,16 @@
 package com.example.broadcastation.presentation
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.bluetooth.BluetoothManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.StrictMode
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -26,9 +22,9 @@ import com.example.broadcastation.common.utility.FIRST_STACK
 import com.example.broadcastation.common.utility.TAG_HOME_FRAGMENT
 import com.example.broadcastation.control.PermissionControl
 import com.example.broadcastation.databinding.ActivityMainBinding
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.BluetoothConfig
 import com.example.broadcastation.entity.config.Config
-import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -57,14 +53,14 @@ class MainActivity : AppCompatActivity() {
             if (!advertiseName.isNullOrEmpty()) {
                 viewModel.setAdvertiseName(advertiseName)
             }
-            logger.i("message advertise")
-            val mesData = bundle.getString(BroadcastService.STA_ADVERTISING_MESSAGE)
-            mesData?.let { data ->
-                val message = viewModel.getDeviceMessage(data)
-                message?.let {
-                    showNotification(it)
-                }
-            }
+//            logger.i("message advertise")
+//            val mesData = bundle.getString(BroadcastService.STA_ADVERTISING_MESSAGE)
+//            mesData?.let { data ->
+//                val message = viewModel.getDeviceMessage(data)
+//                message?.let {
+//                    showNotification(it)
+//                }
+//            }
         }
     }
 
@@ -267,33 +263,33 @@ class MainActivity : AppCompatActivity() {
         BroadcastService.initService(this)
     }
 
-    fun showNotification(message: BroadcastService.AdvertiseData) {
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "Main:ChannelId"
-        val channelName = "Main:Notify"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_DEFAULT,
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val notificationBuilder =
-            NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_broadcast)
-                .setContentTitle(message.name)
-                .setContentText(message.message)
-                .setAutoCancel(true)
-
-        if (viewModel.deviceNoticeId.containsKey(message.name)) {
-            val notificationId = viewModel.deviceNoticeId[message.name]
-            logger.i("notificationId = $notificationId")
-            notificationId?.let { notificationManager.notify(it, notificationBuilder.build()) }
-        }
-    }
+//    fun showNotification(message: BroadcastService.AdvertiseData) {
+//        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+//        val channelId = "Main:ChannelId"
+//        val channelName = "Main:Notify"
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channel = NotificationChannel(
+//                channelId,
+//                channelName,
+//                NotificationManager.IMPORTANCE_DEFAULT,
+//            )
+//            notificationManager.createNotificationChannel(channel)
+//        }
+//
+//        val notificationBuilder =
+//            NotificationCompat.Builder(this, channelId)
+//                .setSmallIcon(R.drawable.ic_broadcast)
+//                .setContentTitle(message.name)
+//                .setContentText(message.message)
+//                .setAutoCancel(true)
+//
+//        if (viewModel.deviceNoticeId.containsKey(message.name)) {
+//            val notificationId = viewModel.deviceNoticeId[message.name]
+//            logger.i("notificationId = $notificationId")
+//            notificationId?.let { notificationManager.notify(it, notificationBuilder.build()) }
+//        }
+//    }
 
     /* **********************************************************************
      * Class

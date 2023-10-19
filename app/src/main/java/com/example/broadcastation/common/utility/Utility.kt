@@ -1,10 +1,9 @@
 package com.example.broadcastation.common.utility
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Build
-import android.provider.Settings
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
@@ -17,6 +16,7 @@ import androidx.fragment.app.commit
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.broadcastation.R
 import com.example.broadcastation.presentation.MainActivity
+import com.example.broadcastation.presentation.add.AddViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 
@@ -25,7 +25,7 @@ const val ID_ARG = "id"
 const val EMPTY = "Không có gì"
 const val ERROR = "Lỗi: "
 
-const val USER_NAME= "tungnt"
+const val USER_NAME = "tungnt"
 const val PASSWORD = "8602"
 
 const val GET_METHOD = "GET"
@@ -39,18 +39,17 @@ const val GET_URL = "https://api.chucknorris.io/"
 const val GET_SUCCESS = "Lấy dữ liệu thành công từ"
 
 const val FIRST_STACK = 1
-const val DELAY_TIME_TO_QUIT : Long = 2000
+const val DELAY_TIME_TO_QUIT: Long = 2000
 const val DRAG_DIRS = 0
-const val SWIPE_DIRS = ItemTouchHelper.RIGHT
+const val SWIPE_RIGHT_DIRS = ItemTouchHelper.RIGHT
 
-@SuppressLint("HardwareIds")
-fun Context.getUUID(): String {
-    return Settings.Secure.getString(
-        contentResolver, Settings.Secure.ANDROID_ID
-    )
-}
-
-fun screenNavigate(fragmentManager: FragmentManager?, navDirection: MainActivity.Navigate, containerView: Int, aimFragment: Fragment, tag: String? = null){
+fun screenNavigate(
+    fragmentManager: FragmentManager?,
+    navDirection: MainActivity.Navigate,
+    containerView: Int,
+    aimFragment: Fragment,
+    tag: String? = null
+) {
     fragmentManager?.commit {
         if (navDirection == MainActivity.Navigate.DOWN) {
             setCustomAnimations(
@@ -59,7 +58,7 @@ fun screenNavigate(fragmentManager: FragmentManager?, navDirection: MainActivity
                 R.anim.slide_in,
                 R.anim.fade_out
             )
-        }else{
+        } else {
             setCustomAnimations(
                 R.anim.slide_in,
                 R.anim.fade_out,
@@ -101,7 +100,9 @@ private fun capitalize(s: String?): String {
 
 fun showMenu(v: View, @MenuRes menuRes: Int, context: Context) {
     val popup = PopupMenu(context, v)
+    popup.menu.add(Menu.NONE, 1, Menu.NONE, "Thêm cũ")
     popup.menuInflater.inflate(menuRes, popup.menu)
+
     popup.setOnMenuItemClickListener { menuItem: MenuItem ->
         (v as TextView).text = menuItem.title.toString()
         true
@@ -109,7 +110,13 @@ fun showMenu(v: View, @MenuRes menuRes: Int, context: Context) {
     popup.show()
 }
 
-fun showCategoryDialog(fragment: Fragment, listCategoryRemote: MutableList<String>, categoryAdapter: ArrayAdapter<String>, view: View){
+fun showCategoryDialog(
+    fragment: Fragment,
+    listCategoryRemote: MutableList<String>,
+    categoryAdapter: ArrayAdapter<String>,
+    view: View,
+    vm: AddViewModel
+) {
     val builder = AlertDialog.Builder(fragment.context)
     val inflater = fragment.layoutInflater
     builder.setTitle(fragment.resources.getString(R.string.add_category_title))
@@ -119,21 +126,31 @@ fun showCategoryDialog(fragment: Fragment, listCategoryRemote: MutableList<Strin
     builder.setView(dialogLayout)
     builder.setPositiveButton(fragment.resources.getString(R.string.ok)) { _, _ ->
         if (newCategory.text.isNullOrEmpty()) {
-            Snackbar.make(
-                view,
-                fragment.resources.getString(R.string.add_category_fail),
-                Snackbar.LENGTH_SHORT
-            ).show()
+            fragment.view?.let {
+                Snackbar.make(
+                    it,
+                    fragment.resources.getString(R.string.add_category_fail),
+                    Snackbar.LENGTH_SHORT
+                )
+                    .setAnchorView(view)
+                    .show()
+            }
         } else {
             listCategoryRemote.add(newCategory.text.toString())
+            vm.saveCategoryList(listCategoryRemote)
             categoryAdapter.notifyDataSetChanged()
-            Snackbar.make(
-                view,
-                "${newCategory.text}: ${fragment.resources.getString(R.string.add_category_success)}",
-                Snackbar.LENGTH_SHORT
-            ).show()
+            fragment.view?.let {
+                Snackbar.make(
+                    it,
+                    "${newCategory.text}: ${fragment.resources.getString(R.string.add_category_success)}",
+                    Snackbar.LENGTH_SHORT
+                )
+                    .setAnchorView(view)
+                    .show()
+            }
         }
     }
     builder.show()
 }
+
 

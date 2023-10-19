@@ -7,9 +7,6 @@ import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
-import android.bluetooth.le.BluetoothLeScanner
-import android.bluetooth.le.ScanFilter
-import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -137,12 +134,14 @@ class BluetoothControl(val callback: Callback) : BaseControl() {
             setTimeout(0)
             setConnectable(false)
         }.build()
+        logger.i("The Tung")
     }
 
     fun startAdvertising(name: String, message: String = "") {
         adapterName = name
         this.message = message
         initAdvertising()
+        logger.i("bluetooth advertise start $bluetoothAdvertiser")
         if (!verifyAdvertise()) {
             return
         }

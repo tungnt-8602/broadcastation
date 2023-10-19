@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/add" android:title="@string/default0_add"/>
+    <item android:id="@+id/return_default" android:title="@string/def_return"/>
     <item android:id="@+id/home" android:title="@string/default1_home"/>
     <item android:id="@+id/work" android:title="@string/default2_work"/>
 </menu>

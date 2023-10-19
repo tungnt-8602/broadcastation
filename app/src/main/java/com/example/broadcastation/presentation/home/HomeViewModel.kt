@@ -23,7 +23,18 @@ class HomeViewModel : BaseViewModel() {
         notice.value = newNotice
     }
 
+    fun getSortType() = local.getSortType()
+
+    fun saveSortType(type: SortType){
+        local.saveSortType(type)
+    }
+
     /* **********************************************************************
     * Class
     ********************************************************************** */
+    enum class SortType {
+        Normal,
+        Category,
+        Custom
+    }
 }

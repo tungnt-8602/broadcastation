@@ -9,9 +9,11 @@ import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.HttpConfig
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.util.Collections
 
 class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFragment.Callback) :
-    RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>() {
+    RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(),
+    ItemMoveCallback.ItemTouchHelperContract{
     /* **********************************************************************
      * Variable
      ********************************************************************** */
@@ -96,5 +98,26 @@ class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFr
         fun postHttp(remote: Remote)
         fun getHttp(remote: Remote)
         fun publishMqtt(remote: Remote)
+    }
+
+    override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(data, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(data, i, i - 1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun onRowSelected(myViewHolder: ViewHolder?) {
+//        myViewHolder?.itemView?.setBackgroundResource(R.color.scc_100)
+    }
+
+    override fun onRowClear(myViewHolder: ViewHolder?) {
+//        myViewHolder?.itemView?.setBackgroundColor(Color.WHITE)
     }
 }

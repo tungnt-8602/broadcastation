@@ -22,15 +22,14 @@ import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.ID_ARG
 import com.example.broadcastation.common.utility.ID_REQUEST_KEY
 import com.example.broadcastation.common.utility.POST_URL
-import com.example.broadcastation.common.utility.SWIPE_DIRS
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
 import com.example.broadcastation.databinding.HomeFragmentBinding
+import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.BluetoothConfig
 import com.example.broadcastation.entity.config.Config
 import com.example.broadcastation.entity.config.MqttConfig
-import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
@@ -51,6 +50,7 @@ class HomeFragment(val callback: Callback) :
     lateinit var type: Type
     val gson = Gson()
     private lateinit var config: Config
+    var sortType: HomeViewModel.SortType = HomeViewModel.SortType.Normal
 
     /* **********************************************************************
      * Life Cycle
@@ -74,10 +74,7 @@ class HomeFragment(val callback: Callback) :
             binding.remoteList.visibility = View.VISIBLE
         }
 
-        logger.i("Recycler view")
-        binding.remoteList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        val adapter = ItemRemoteAdapter(callback = object : ItemRemoteAdapter.Callback {
+        val itemCallBack = object : ItemRemoteAdapter.Callback {
             override fun shareBluetooth(remote: Remote, callback: Callback) {
                 val isTurnedOn =
                     activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
@@ -125,11 +122,22 @@ class HomeFragment(val callback: Callback) :
                 }
 
             }
-        }, callback)
+        }
+
+        val adapter = ItemRemoteAdapter(callback = itemCallBack, callback)
         adapter.setData(remoteList)
         binding.remoteList.adapter = adapter
+        binding.remoteList.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(DRAG_DIRS, SWIPE_DIRS) {
+        binding.sortRemote.setOnClickListener {
+            val callback: ItemTouchHelper.Callback = ItemMoveCallback(adapter)
+            val touchHelper = ItemTouchHelper(callback)
+            touchHelper.attachToRecyclerView(binding.remoteList)
+            binding.remoteList.adapter = adapter
+        }
+
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(DRAG_DIRS, ItemTouchHelper.END ) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -160,7 +168,6 @@ class HomeFragment(val callback: Callback) :
             }
         }).attachToRecyclerView(binding.remoteList)
 
-        logger.i("Item navigate: Update remote")
         adapter.setOnItemTouchListener {
             callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
             setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))

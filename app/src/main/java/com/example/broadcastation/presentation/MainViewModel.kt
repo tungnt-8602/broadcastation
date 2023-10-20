@@ -8,11 +8,12 @@ import com.example.broadcastation.common.base.BaseViewModel
 import com.example.broadcastation.common.utility.EMPTY
 import com.example.broadcastation.common.utility.ERROR
 import com.example.broadcastation.common.utility.GET_SUCCESS
-import com.example.broadcastation.common.utility.GET_URL
-import com.example.broadcastation.common.utility.POST_URL
 import com.example.broadcastation.entity.Remote
+import com.example.broadcastation.entity.config.Config
+import com.example.broadcastation.entity.config.HttpConfig
 import com.example.broadcastation.entity.http_api.RetrofitAPI
 import com.example.broadcastation.presentation.home.HomeFragment
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
@@ -62,43 +63,59 @@ class MainViewModel : BaseViewModel() {
     fun getAllRemote() = local.getAllRemote()
 
     fun postHttp(remote: Remote) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(POST_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
-        val call: Call<Remote?>? = retrofitAPI.postRemoteContent(remote)
-        call?.enqueue(object : Callback<Remote?> {
-            override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
-                local.saveMessageBroadcast(response.body()?.describe ?: EMPTY)
-                logger.i("Post Http with body: ${response.body()}")
-            }
+        val type = object : TypeToken<HttpConfig>() {}.type
+        val config: Config = gson.fromJson(remote.config, type)
+        val url = (config as HttpConfig).url
+        try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
+            val call: Call<Remote> = retrofitAPI.postRemoteContent(remote)
+            call.enqueue(object : Callback<Remote?> {
+                override fun onResponse(call: Call<Remote?>, response: Response<Remote?>) {
+                    local.saveMessageBroadcast(response.body()?.describe ?: EMPTY)
+                    logger.i("Post Http with body: ${response.body()}")
+                }
 
-            override fun onFailure(call: Call<Remote?>, t: Throwable) {
-                local.saveMessageBroadcast(ERROR + t.message)
-            }
-        })
+                override fun onFailure(call: Call<Remote?>, t: Throwable) {
+                    local.saveMessageBroadcast(ERROR + t.message)
+                }
+            })
+        } catch (e: Exception) {
+            local.saveMessageBroadcast(e.toString())
+            logger.i("Invalid Url: $e")
+        }
     }
 
-    fun getHttp() {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(GET_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
-        val call = retrofitAPI.getContent()
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: Response<Any>) {
-                if (response.body().toString().isNotEmpty()) {
-                    local.saveMessageBroadcast("$GET_SUCCESS $GET_URL")
-                    logger.i("Get Http with body: ${response.body()}")
+    fun getHttp(remote: Remote) {
+        val type = object : TypeToken<HttpConfig>() {}.type
+        val config: Config = gson.fromJson(remote.config, type)
+        val url = (config as HttpConfig).url
+        try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val retrofitAPI = retrofit.create(RetrofitAPI::class.java)
+            val call = retrofitAPI.getContent()
+            call.enqueue(object : Callback<Any> {
+                override fun onResponse(call: Call<Any>, response: Response<Any>) {
+                    if (response.body().toString().isNotEmpty()) {
+                        local.saveMessageBroadcast("$GET_SUCCESS $url")
+                        logger.i("Get Http with body: ${response.body()}")
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                local.saveMessageBroadcast(ERROR + t.message)
-            }
-        })
+                override fun onFailure(call: Call<Any>, t: Throwable) {
+                    local.saveMessageBroadcast(ERROR + t.message)
+                }
+            })
+        } catch (e: Exception) {
+            local.saveMessageBroadcast(e.toString())
+            logger.i("Invalid Url: $e")
+        }
     }
 
     fun shareBluetooth(remoteR: Remote, callback: HomeFragment.Callback) {

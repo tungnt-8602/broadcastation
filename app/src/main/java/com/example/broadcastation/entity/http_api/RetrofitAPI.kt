@@ -8,7 +8,7 @@ import retrofit2.http.POST
 
 interface RetrofitAPI {
     @POST("remote")
-    fun postRemoteContent(@Body content: Remote?): Call<Remote?>?
+    fun postRemoteContent(@Body content: Remote?): Call<Remote>
 
     @GET("jokes/random")
     fun getContent(): Call<Any>

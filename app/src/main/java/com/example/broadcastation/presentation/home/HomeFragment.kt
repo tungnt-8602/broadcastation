@@ -18,10 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.R
 import com.example.broadcastation.common.base.BaseFragment
 import com.example.broadcastation.common.utility.DRAG_DIRS
-import com.example.broadcastation.common.utility.GET_URL
 import com.example.broadcastation.common.utility.ID_ARG
 import com.example.broadcastation.common.utility.ID_REQUEST_KEY
-import com.example.broadcastation.common.utility.POST_URL
 import com.example.broadcastation.common.utility.TAG_ADD_FRAGMENT
 import com.example.broadcastation.common.utility.TAG_UPDATE_FRAGMENT
 import com.example.broadcastation.common.utility.screenNavigate
@@ -84,11 +82,7 @@ class HomeFragment(val callback: Callback) :
                         type = object : TypeToken<BluetoothConfig>() {}.type
                         config = gson.fromJson(remote.config, type)
                         callback.saveMessageBroadcast((config as BluetoothConfig).content)
-                        callback.getMessageBroadcast().let {
-                            logger.i("Share ble")
-                            Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                                .setAnchorView(binding.add).show()
-                        }
+                        homeViewModel.noticeBroadcast(callback.getMessageBroadcast())
                     } else {
                         callback.grantBluetoothPermission(remote, callback, binding.add)
                     }
@@ -99,12 +93,12 @@ class HomeFragment(val callback: Callback) :
 
             override fun postHttp(remote: Remote) {
                 callback.postHttp(remote)
-                homeViewModel.noticeBroadcast("${resources.getString(homeViewModel.noticePostHttp)} $POST_URL")
+                homeViewModel.noticeBroadcast(callback.getMessageBroadcast())
             }
 
             override fun getHttp(remote: Remote) {
                 callback.getHttp(remote)
-                homeViewModel.noticeBroadcast("${resources.getString(homeViewModel.noticeGetHttp)} $GET_URL")
+                homeViewModel.noticeBroadcast(callback.getMessageBroadcast())
             }
 
             override fun publishMqtt(remote: Remote) {
@@ -113,14 +107,10 @@ class HomeFragment(val callback: Callback) :
                     config = gson.fromJson(remote.config, type)
                     callback.publishMqtt(remote, callback, requireContext())
                     callback.saveMessageBroadcast((config as MqttConfig).content)
-                    callback.getMessageBroadcast().let {
-                        Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
-                            .setAnchorView(binding.add).show()
-                    }
+                    homeViewModel.noticeBroadcast(callback.getMessageBroadcast())
                 } catch (e: Exception) {
                     logger.w(e.message ?: "Publish Mqtt")
                 }
-
             }
         }
 
@@ -190,7 +180,6 @@ class HomeFragment(val callback: Callback) :
                 TAG_ADD_FRAGMENT
             )
         }
-
         logger.i("Message after type")
         val message = callback.updateNotice()
         if (message != "") {

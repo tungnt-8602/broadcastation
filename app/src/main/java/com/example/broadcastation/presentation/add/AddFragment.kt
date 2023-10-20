@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.webkit.URLUtil
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListPopupWindow
@@ -122,9 +123,9 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
         if (name.isEmpty()) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_name))
-        } else if (binding.http.httpUrlText.text.isNullOrEmpty() && type == ItemRemoteAdapter.Type.HTTP) {
+        } else if ((binding.http.httpUrlText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.http.httpUrlText.text.toString())) && type == ItemRemoteAdapter.Type.HTTP ) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_http_url))
-        } else if ((binding.mqtt.domainText.text.isNullOrEmpty() || binding.mqtt.channelText.text.isNullOrEmpty()) && type == ItemRemoteAdapter.Type.MQTT) {
+        } else if ((binding.mqtt.domainText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.mqtt.domainText.text.toString()) || binding.mqtt.channelText.text.isNullOrEmpty()) && type == ItemRemoteAdapter.Type.MQTT) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_mqtt_domain_channel))
         } else {
             logger.i("Handle add or update")
@@ -151,6 +152,12 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 }
                 callback.updateRemote(oldRemoteList)
             }
+            screenNavigate(
+                fragmentManager,
+                MainActivity.Navigate.DOWN,
+                R.id.mainContainer,
+                HomeFragment(callback)
+            )
         }
     }
 
@@ -293,7 +300,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
             }
         }
 
-
         logger.i("Navigate to home after save")
         binding.saveRemote.setOnClickListener {
             saveInputAsRemote(
@@ -301,12 +307,6 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 binding.remoteDescriptionText.text.toString(),
                 binding.categoryRemoteText.text.toString(),
                 typeBroadcast, callback
-            )
-            screenNavigate(
-                fragmentManager,
-                MainActivity.Navigate.DOWN,
-                R.id.mainContainer,
-                HomeFragment(callback)
             )
         }
     }

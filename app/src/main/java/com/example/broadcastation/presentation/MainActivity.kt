@@ -53,14 +53,6 @@ class MainActivity : AppCompatActivity() {
             if (!advertiseName.isNullOrEmpty()) {
                 viewModel.setAdvertiseName(advertiseName)
             }
-//            logger.i("message advertise")
-//            val mesData = bundle.getString(BroadcastService.STA_ADVERTISING_MESSAGE)
-//            mesData?.let { data ->
-//                val message = viewModel.getDeviceMessage(data)
-//                message?.let {
-//                    showNotification(it)
-//                }
-//            }
         }
     }
 
@@ -119,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun getHttp(remote: Remote) {
-                    viewModel.getHttp()
+                    viewModel.getHttp(remote)
                 }
 
                 override fun publishMqtt(
@@ -263,34 +255,6 @@ class MainActivity : AppCompatActivity() {
         BroadcastService.initService(this)
     }
 
-//    fun showNotification(message: BroadcastService.AdvertiseData) {
-//        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-//        val channelId = "Main:ChannelId"
-//        val channelName = "Main:Notify"
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val channel = NotificationChannel(
-//                channelId,
-//                channelName,
-//                NotificationManager.IMPORTANCE_DEFAULT,
-//            )
-//            notificationManager.createNotificationChannel(channel)
-//        }
-//
-//        val notificationBuilder =
-//            NotificationCompat.Builder(this, channelId)
-//                .setSmallIcon(R.drawable.ic_broadcast)
-//                .setContentTitle(message.name)
-//                .setContentText(message.message)
-//                .setAutoCancel(true)
-//
-//        if (viewModel.deviceNoticeId.containsKey(message.name)) {
-//            val notificationId = viewModel.deviceNoticeId[message.name]
-//            logger.i("notificationId = $notificationId")
-//            notificationId?.let { notificationManager.notify(it, notificationBuilder.build()) }
-//        }
-//    }
-
     /* **********************************************************************
      * Class
      ********************************************************************** */
@@ -336,11 +300,10 @@ class MainActivity : AppCompatActivity() {
 
                     override fun postHttp(remote: Remote) {
                         viewModel.postHttp(remote)
-
                     }
 
                     override fun getHttp(remote: Remote) {
-                        viewModel.getHttp()
+                        viewModel.getHttp(remote)
                     }
 
                     override fun publishMqtt(

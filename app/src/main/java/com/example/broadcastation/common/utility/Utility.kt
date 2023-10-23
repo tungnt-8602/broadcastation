@@ -41,6 +41,7 @@ const val GET_SUCCESS = "Lấy dữ liệu thành công từ"
 const val FIRST_STACK = 1
 const val DELAY_TIME_TO_QUIT: Long = 2000
 const val DRAG_DIRS = 0
+const val NO_DRAG_DIRS = -1
 const val SWIPE_RIGHT_DIRS = ItemTouchHelper.RIGHT
 
 fun screenNavigate(
@@ -72,7 +73,6 @@ fun screenNavigate(
             tag
         )
         addToBackStack(null)
-        setReorderingAllowed(true)
     }
 }
 
@@ -100,7 +100,6 @@ private fun capitalize(s: String?): String {
 
 fun showMenu(v: View, @MenuRes menuRes: Int, context: Context) {
     val popup = PopupMenu(context, v)
-    popup.menu.add(Menu.NONE, 1, Menu.NONE, "Thêm cũ")
     popup.menuInflater.inflate(menuRes, popup.menu)
 
     popup.setOnMenuItemClickListener { menuItem: MenuItem ->

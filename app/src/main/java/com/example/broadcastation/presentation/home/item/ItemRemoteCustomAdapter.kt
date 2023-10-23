@@ -1,4 +1,4 @@
-package com.example.broadcastation.presentation.home
+package com.example.broadcastation.presentation.home.item
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -7,13 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.broadcastation.databinding.ItemRemoteBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.HttpConfig
+import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Collections
 
-class ItemRemoteAdapter(var callback: Callback, private var homeCallback: HomeFragment.Callback) :
-    RecyclerView.Adapter<ItemRemoteAdapter.ViewHolder>(),
-    ItemMoveCallback.ItemTouchHelperContract{
+class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: HomeFragment.Callback) :
+    RecyclerView.Adapter<ItemRemoteCustomAdapter.ViewHolder>(),
+    ItemMoveCustomCallback.ItemTouchHelperContract {
     /* **********************************************************************
      * Variable
      ********************************************************************** */

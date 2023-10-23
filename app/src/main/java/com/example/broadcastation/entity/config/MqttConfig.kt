@@ -1,6 +1,6 @@
 package com.example.broadcastation.entity.config
 
-import com.example.broadcastation.presentation.home.ItemRemoteAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
 
 data class MqttConfig(
     val user: String,
@@ -9,4 +9,4 @@ data class MqttConfig(
     val port: String?,
     val channel: String,
     val content: String
-) : Config(ItemRemoteAdapter.Type.MQTT)
+) : Config(ItemRemoteCustomAdapter.Type.MQTT)

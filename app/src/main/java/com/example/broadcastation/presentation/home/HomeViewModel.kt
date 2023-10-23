@@ -16,6 +16,11 @@ class HomeViewModel : BaseViewModel() {
     val noticeGetHttp = R.string.get_http_notice
     val noticePostHttp = R.string.post_http_notice
 
+    val noticeCustom = R.string.custom_noti
+    val noticeNormal = R.string.normal_noti
+
+    val menuFilter = R.menu.filter_menu
+
     /* **********************************************************************
      * Function
      ********************************************************************** */
@@ -34,6 +39,7 @@ class HomeViewModel : BaseViewModel() {
     ********************************************************************** */
     enum class SortType {
         Normal,
+        Grid,
         Category,
         Custom
     }

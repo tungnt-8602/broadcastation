@@ -1,5 +1,5 @@
 package com.example.broadcastation.entity.config
 
-import com.example.broadcastation.presentation.home.ItemRemoteAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
 
-open class Config(val type: ItemRemoteAdapter.Type)
+open class Config(val type: ItemRemoteCustomAdapter.Type)

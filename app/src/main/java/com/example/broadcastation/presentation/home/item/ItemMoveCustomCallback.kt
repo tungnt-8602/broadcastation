@@ -1,11 +1,9 @@
-package com.example.broadcastation.presentation.home
+package com.example.broadcastation.presentation.home.item
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-
-
-class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
+class ItemMoveCustomCallback(private val mAdapter: ItemTouchHelperContract?) :
     ItemTouchHelper.Callback() {
     override fun isLongPressDragEnabled(): Boolean {
         return true
@@ -28,7 +26,7 @@ class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        mAdapter.onRowMoved(viewHolder.adapterPosition, target.adapterPosition)
+        mAdapter?.onRowMoved(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
 
@@ -37,8 +35,8 @@ class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
         actionState: Int
     ) {
         if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder is ItemRemoteAdapter.ViewHolder) {
-                mAdapter.onRowSelected(viewHolder)
+            if (viewHolder is ItemRemoteCustomAdapter.ViewHolder) {
+                mAdapter?.onRowSelected(viewHolder)
             }
         }
         super.onSelectedChanged(viewHolder, actionState)
@@ -49,14 +47,14 @@ class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) :
         viewHolder: RecyclerView.ViewHolder
     ) {
         super.clearView(recyclerView, viewHolder)
-        if (viewHolder is ItemRemoteAdapter.ViewHolder) {
-            mAdapter.onRowClear(viewHolder)
+        if (viewHolder is ItemRemoteCustomAdapter.ViewHolder) {
+            mAdapter?.onRowClear(viewHolder)
         }
     }
 
     interface ItemTouchHelperContract {
         fun onRowMoved(fromPosition: Int, toPosition: Int)
-        fun onRowSelected(myViewHolder: ItemRemoteAdapter.ViewHolder?)
-        fun onRowClear(myViewHolder: ItemRemoteAdapter.ViewHolder?)
+        fun onRowSelected(myViewHolder: ItemRemoteCustomAdapter.ViewHolder?)
+        fun onRowClear(myViewHolder: ItemRemoteCustomAdapter.ViewHolder?)
     }
 }

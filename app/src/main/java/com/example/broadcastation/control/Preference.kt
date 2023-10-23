@@ -126,6 +126,7 @@ class Preference {
 
     fun getSortType(): HomeViewModel.SortType {
         return when(shared?.getString(sortRemote, "Normal")){
+            "Grid" -> HomeViewModel.SortType.Grid
             "Category" -> HomeViewModel.SortType.Category
             "Custom" -> HomeViewModel.SortType.Custom
             else -> HomeViewModel.SortType.Normal
@@ -135,6 +136,7 @@ class Preference {
     fun saveSortType(type: HomeViewModel.SortType) {
         val stringType = when(type){
             HomeViewModel.SortType.Normal -> "Normal"
+            HomeViewModel.SortType.Grid -> "Grid"
             HomeViewModel.SortType.Category -> "Category"
             HomeViewModel.SortType.Custom -> "Custom"
         }

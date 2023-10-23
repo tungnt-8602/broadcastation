@@ -59,6 +59,12 @@
     <string name="undo">Hoàn tác</string>
     <string name="backToHome">Quay lại</string>
     <string name="def_return">Trở về mặc định</string>
+    <string name="custom_noti">Đã chuyển qua dạng Custom</string>
+    <string name="normal_noti">Đã chuyển qua dạng Normal</string>
+    <string name="normal_filter">Mặc định</string>
+    <string name="category_filter">Theo danh mục</string>
+    <string name="custom_filter">Tùy chỉnh</string>
+    <string name="grid_filter">Dạng lưới</string>
 
     <string-array name="remote_menu">
         <item>Bluetooth</item>

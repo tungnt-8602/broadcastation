@@ -5,13 +5,16 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -31,6 +34,9 @@ import com.example.broadcastation.entity.config.MqttConfig
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
+import com.example.broadcastation.presentation.home.item.ItemMoveCustomCallback
+import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteNormalAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -60,7 +66,7 @@ class HomeFragment(val callback: Callback) :
         if (!isAdded) {
             return
         }
-        fragmentManager = activity?.supportFragmentManager
+        fragmentManager = parentFragmentManager
 
         logger.i("Empty/list display")
         val remoteList = callback.getAllRemote()
@@ -72,7 +78,8 @@ class HomeFragment(val callback: Callback) :
             binding.remoteList.visibility = View.VISIBLE
         }
 
-        val itemCallBack = object : ItemRemoteAdapter.Callback {
+        logger.i("Common item callback for all adapter")
+        val itemCallBack = object : ItemRemoteCustomAdapter.Callback {
             override fun shareBluetooth(remote: Remote, callback: Callback) {
                 val isTurnedOn =
                     activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
@@ -114,20 +121,12 @@ class HomeFragment(val callback: Callback) :
             }
         }
 
-        val adapter = ItemRemoteAdapter(callback = itemCallBack, callback)
-        adapter.setData(remoteList)
-        binding.remoteList.adapter = adapter
-        binding.remoteList.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-
-        binding.sortRemote.setOnClickListener {
-            val callback: ItemTouchHelper.Callback = ItemMoveCallback(adapter)
-            val touchHelper = ItemTouchHelper(callback)
-            touchHelper.attachToRecyclerView(binding.remoteList)
-            binding.remoteList.adapter = adapter
-        }
-
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(DRAG_DIRS, ItemTouchHelper.END ) {
+        val adapter = ItemRemoteNormalAdapter(callback = itemCallBack, callback)
+        val customAdapter = ItemRemoteCustomAdapter(callback = itemCallBack, callback)
+        val itemCustomCallback: ItemTouchHelper.Callback = ItemMoveCustomCallback(customAdapter)
+        val touchCustomHelper = ItemTouchHelper(itemCustomCallback)
+        val touchHelper = ItemTouchHelper(object :
+            ItemTouchHelper.SimpleCallback(DRAG_DIRS, ItemTouchHelper.END) {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
@@ -140,7 +139,7 @@ class HomeFragment(val callback: Callback) :
                 val position = viewHolder.adapterPosition
                 val deletedRemote: Remote = remoteList[position]
                 remoteList.removeAt(position)
-                callback.updateRemote(remoteList)
+                this@HomeFragment.callback.updateRemote(remoteList)
                 adapter.setData(remoteList)
 
                 // below line is to display our snackbar with action.
@@ -152,11 +151,76 @@ class HomeFragment(val callback: Callback) :
                     .setAnchorView(binding.add)
                     .setAction(homeViewModel.undo) {
                         remoteList.add(position, deletedRemote)
-                        callback.updateRemote(remoteList)
+                        this@HomeFragment.callback.updateRemote(remoteList)
                         adapter.setData(remoteList)
                     }.show()
             }
-        }).attachToRecyclerView(binding.remoteList)
+        })
+
+        when(homeViewModel.getSortType()){
+            HomeViewModel.SortType.Normal-> {
+                adapter.setData(remoteList)
+                binding.remoteList.adapter = adapter
+                touchCustomHelper.attachToRecyclerView(null)
+                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+            }
+            HomeViewModel.SortType.Custom -> {
+                customAdapter.setData(remoteList)
+                binding.remoteList.adapter = customAdapter
+                touchCustomHelper.attachToRecyclerView(binding.remoteList)
+                homeViewModel.saveSortType(HomeViewModel.SortType.Custom)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
+            }
+            HomeViewModel.SortType.Grid -> {
+                adapter.setData(remoteList)
+                binding.remoteList.adapter = adapter
+                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 2)
+                touchCustomHelper.attachToRecyclerView(null)
+                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+            }
+            HomeViewModel.SortType.Category -> {}
+        }
+
+        binding.sortRemote.setOnClickListener {
+            val popup = PopupMenu(requireContext(), it)
+            popup.apply {
+                menuInflater.inflate(homeViewModel.menuFilter, popup.menu)
+                setOnMenuItemClickListener { menuItem: MenuItem ->
+                    when (menuItem.title) {
+                        resources.getString(R.string.normal_filter)-> {
+                            adapter.setData(remoteList)
+                            binding.remoteList.adapter = adapter
+                            touchCustomHelper.attachToRecyclerView(null)
+                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                            homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+                        }
+                        resources.getString(R.string.custom_filter) -> {
+                            customAdapter.setData(remoteList)
+                            binding.remoteList.adapter = customAdapter
+                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                            touchCustomHelper.attachToRecyclerView(binding.remoteList)
+                            homeViewModel.saveSortType(HomeViewModel.SortType.Custom)
+                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
+                        }
+                        resources.getString(R.string.grid_filter) -> {
+                            adapter.setData(remoteList)
+                            binding.remoteList.adapter = adapter
+                            binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 2)
+                            touchCustomHelper.attachToRecyclerView(null)
+                            homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
+                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+                        }
+                    }
+                    true
+                }
+                show()
+            }
+        }
+
+        touchHelper.attachToRecyclerView(binding.remoteList)
 
         adapter.setOnItemTouchListener {
             callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
@@ -191,6 +255,36 @@ class HomeFragment(val callback: Callback) :
             Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT)
                 .setAnchorView(binding.add).show()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        logger.i("TT")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        logger.i("TT")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        logger.i("TT")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logger.i("TT")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logger.i("TT")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logger.i("TT")
     }
 
     /* **********************************************************************

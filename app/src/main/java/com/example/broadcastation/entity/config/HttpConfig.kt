@@ -1,9 +1,9 @@
 package com.example.broadcastation.entity.config
 
-import com.example.broadcastation.presentation.home.ItemRemoteAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
 
 data class HttpConfig(
     val url: String,
-    val method: ItemRemoteAdapter.HttpMethod,
+    val method: ItemRemoteCustomAdapter.HttpMethod,
     val content: String
-) : Config(ItemRemoteAdapter.Type.HTTP)
+) : Config(ItemRemoteCustomAdapter.Type.HTTP)

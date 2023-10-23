@@ -33,7 +33,7 @@ import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.HttpConfig
 import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.home.HomeFragment
-import com.example.broadcastation.presentation.home.ItemRemoteAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -45,7 +45,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    private var typeBroadcast: ItemRemoteAdapter.Type = ItemRemoteAdapter.Type.BLUETOOTH
+    private var typeBroadcast: ItemRemoteCustomAdapter.Type = ItemRemoteCustomAdapter.Type.BLUETOOTH
     private lateinit var remoteUpdate: Remote
     private val addViewModel: AddViewModel by viewModels()
     val gson = Gson()
@@ -68,6 +68,36 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        logger.i("TT")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        logger.i("TT")
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        logger.i("TT")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logger.i("TT")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logger.i("TT")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logger.i("TT")
+    }
+
     /* ***********************************************************************
      * Function
      ********************************************************************** */
@@ -75,7 +105,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         name: String,
         describe: String,
         category: String,
-        type: ItemRemoteAdapter.Type,
+        type: ItemRemoteCustomAdapter.Type,
         callback: HomeFragment.Callback
     ) {
         val icon: Int
@@ -83,21 +113,21 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         val config: String
         logger.i("Handle icon, type and config")
         when (type) {
-            ItemRemoteAdapter.Type.HTTP -> {
+            ItemRemoteCustomAdapter.Type.HTTP -> {
                 icon = R.drawable.ic_http
                 config = gson.toJson(
                     HttpConfig(
                         binding.http.httpUrlText.text.toString(),
                         when (binding.http.httpMethod.text.toString().uppercase()) {
-                            POST_METHOD -> ItemRemoteAdapter.HttpMethod.POST
-                            else -> ItemRemoteAdapter.HttpMethod.GET
+                            POST_METHOD -> ItemRemoteCustomAdapter.HttpMethod.POST
+                            else -> ItemRemoteCustomAdapter.HttpMethod.GET
                         },
                         binding.http.httpContentText.text.toString()
                     )
                 )
             }
 
-            ItemRemoteAdapter.Type.BLUETOOTH -> {
+            ItemRemoteCustomAdapter.Type.BLUETOOTH -> {
                 icon = R.drawable.ic_local
                 config = gson.toJson(
                     BluetoothConfig(
@@ -107,7 +137,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                 )
             }
 
-            ItemRemoteAdapter.Type.MQTT -> {
+            ItemRemoteCustomAdapter.Type.MQTT -> {
                 icon = R.drawable.ic_mqtt
                 config = gson.toJson(
                     MqttConfig(
@@ -123,9 +153,9 @@ class AddFragment(private val callback: HomeFragment.Callback) :
         }
         if (name.isEmpty()) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_name))
-        } else if ((binding.http.httpUrlText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.http.httpUrlText.text.toString())) && type == ItemRemoteAdapter.Type.HTTP ) {
+        } else if ((binding.http.httpUrlText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.http.httpUrlText.text.toString())) && type == ItemRemoteCustomAdapter.Type.HTTP ) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_http_url))
-        } else if ((binding.mqtt.domainText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.mqtt.domainText.text.toString()) || binding.mqtt.channelText.text.isNullOrEmpty()) && type == ItemRemoteAdapter.Type.MQTT) {
+        } else if ((binding.mqtt.domainText.text.isNullOrEmpty() || !URLUtil.isValidUrl(binding.mqtt.domainText.text.toString()) || binding.mqtt.channelText.text.isNullOrEmpty()) && type == ItemRemoteCustomAdapter.Type.MQTT) {
             addViewModel.noticeVerify(resources.getString(R.string.empty_mqtt_domain_channel))
         } else {
             logger.i("Handle add or update")
@@ -189,21 +219,21 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                     binding.local.root.visibility = View.VISIBLE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.GONE
-                    typeBroadcast = ItemRemoteAdapter.Type.BLUETOOTH
+                    typeBroadcast = ItemRemoteCustomAdapter.Type.BLUETOOTH
                 }
 
                 listRemote[1] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.VISIBLE
                     binding.mqtt.root.visibility = View.GONE
-                    typeBroadcast = ItemRemoteAdapter.Type.HTTP
+                    typeBroadcast = ItemRemoteCustomAdapter.Type.HTTP
                 }
 
                 listRemote[2] -> {
                     binding.local.root.visibility = View.GONE
                     binding.http.root.visibility = View.GONE
                     binding.mqtt.root.visibility = View.VISIBLE
-                    typeBroadcast = ItemRemoteAdapter.Type.MQTT
+                    typeBroadcast = ItemRemoteCustomAdapter.Type.MQTT
                 }
             }
         }
@@ -269,14 +299,14 @@ class AddFragment(private val callback: HomeFragment.Callback) :
 
             try {
                 when (remoteUpdate.type) {
-                    ItemRemoteAdapter.Type.BLUETOOTH -> {
+                    ItemRemoteCustomAdapter.Type.BLUETOOTH -> {
                         binding.optionRemote.text = listRemote[0]
                         type = object : TypeToken<BluetoothConfig>() {}.type
                         config = gson.fromJson(remoteUpdate.config, type)
                         binding.local.localContentText.setText((config as BluetoothConfig).content)
                     }
 
-                    ItemRemoteAdapter.Type.HTTP -> {
+                    ItemRemoteCustomAdapter.Type.HTTP -> {
                         binding.optionRemote.text = listRemote[1]
                         type = object : TypeToken<HttpConfig>() {}.type
                         config = gson.fromJson(remoteUpdate.config, type)
@@ -285,7 +315,7 @@ class AddFragment(private val callback: HomeFragment.Callback) :
                         binding.http.httpContentText.setText((config as HttpConfig).content)
                     }
 
-                    ItemRemoteAdapter.Type.MQTT -> {
+                    ItemRemoteCustomAdapter.Type.MQTT -> {
                         binding.optionRemote.text = listRemote[2]
                         type = object : TypeToken<MqttConfig>() {}.type
                         config = gson.fromJson(remoteUpdate.config, type)

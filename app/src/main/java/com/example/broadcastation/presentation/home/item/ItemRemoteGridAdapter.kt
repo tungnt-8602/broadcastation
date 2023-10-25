@@ -4,15 +4,15 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.broadcastation.databinding.ItemRemoteLinearBinding
+import com.example.broadcastation.databinding.ItemRemoteGridBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.HttpConfig
 import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-class ItemRemoteNormalAdapter(var callback: ItemRemoteCustomAdapter.Callback, private var homeCallback: HomeFragment.Callback) :
-    RecyclerView.Adapter<ItemRemoteNormalAdapter.ViewHolder>() {
+class ItemRemoteGridAdapter(var callback: ItemRemoteCustomAdapter.Callback, private var homeCallback: HomeFragment.Callback) :
+    RecyclerView.Adapter<ItemRemoteGridAdapter.ViewHolder>() {
 
     /* **********************************************************************
      * Variable
@@ -25,7 +25,7 @@ class ItemRemoteNormalAdapter(var callback: ItemRemoteCustomAdapter.Callback, pr
     ********************************************************************** */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
-            ItemRemoteLinearBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemRemoteGridBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -41,10 +41,10 @@ class ItemRemoteNormalAdapter(var callback: ItemRemoteCustomAdapter.Callback, pr
         val item = data[position]
         with(holder.binding) {
             remoteName.text = item.name
-            remoteIcon.setImageResource(item.icon)
-            remoteContent.text = item.describe
+            remoteType.setImageResource(item.icon)
+            remoteDescribe.text = item.describe
         }
-        holder.binding.broadcast.setOnClickListener {
+        holder.binding.remoteBroadcast.setOnClickListener {
             when (data[position].type) {
                 ItemRemoteCustomAdapter.Type.BLUETOOTH -> {
                     callback.shareBluetooth(data[position], homeCallback)
@@ -90,5 +90,5 @@ class ItemRemoteNormalAdapter(var callback: ItemRemoteCustomAdapter.Callback, pr
     /* **********************************************************************
      * Class
      ********************************************************************** */
-    class ViewHolder(val binding: ItemRemoteLinearBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemRemoteGridBinding) : RecyclerView.ViewHolder(binding.root)
 }

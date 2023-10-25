@@ -35,7 +35,9 @@ import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
 import com.example.broadcastation.presentation.home.item.ItemMoveCustomCallback
+import com.example.broadcastation.presentation.home.item.ItemRemoteCategoryAdapter
 import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
+import com.example.broadcastation.presentation.home.item.ItemRemoteGridAdapter
 import com.example.broadcastation.presentation.home.item.ItemRemoteNormalAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
@@ -54,7 +56,6 @@ class HomeFragment(val callback: Callback) :
     lateinit var type: Type
     val gson = Gson()
     private lateinit var config: Config
-    var sortType: HomeViewModel.SortType = HomeViewModel.SortType.Normal
 
     /* **********************************************************************
      * Life Cycle
@@ -122,6 +123,8 @@ class HomeFragment(val callback: Callback) :
         }
 
         val adapter = ItemRemoteNormalAdapter(callback = itemCallBack, callback)
+        val gridAdapter = ItemRemoteGridAdapter(callback = itemCallBack, callback)
+        val categoryAdapter = ItemRemoteCategoryAdapter(callback = itemCallBack, callback)
         val customAdapter = ItemRemoteCustomAdapter(callback = itemCallBack, callback)
         val itemCustomCallback: ItemTouchHelper.Callback = ItemMoveCustomCallback(customAdapter)
         val touchCustomHelper = ItemTouchHelper(itemCustomCallback)
@@ -157,6 +160,17 @@ class HomeFragment(val callback: Callback) :
             }
         })
 
+        val data = mutableMapOf<MutableList<Any>, MutableList<Remote>>()
+        for(remote in remoteList){
+            val key : MutableList<Any> = mutableListOf(remote.category)
+            if (!data.containsKey(key)) {
+                data[key] = mutableListOf()
+                data[key]?.add(remote)
+            }else{
+                data[key]?.add(remote)
+            }
+        }
+
         when(homeViewModel.getSortType()){
             HomeViewModel.SortType.Normal-> {
                 adapter.setData(remoteList)
@@ -173,14 +187,22 @@ class HomeFragment(val callback: Callback) :
                 homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
             }
             HomeViewModel.SortType.Grid -> {
-                adapter.setData(remoteList)
-                binding.remoteList.adapter = adapter
-                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 2)
+                gridAdapter.setData(remoteList)
+                binding.remoteList.adapter = gridAdapter
+                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
                 touchCustomHelper.attachToRecyclerView(null)
-                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
-                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+                homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeGrid))
             }
-            HomeViewModel.SortType.Category -> {}
+            HomeViewModel.SortType.Category -> {
+                categoryAdapter.setData(data)
+                logger.i("ttt $data")
+                binding.remoteList.adapter = categoryAdapter
+                touchCustomHelper.attachToRecyclerView(null)
+                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                homeViewModel.saveSortType(HomeViewModel.SortType.Category)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
+            }
         }
 
         binding.sortRemote.setOnClickListener {
@@ -206,12 +228,20 @@ class HomeFragment(val callback: Callback) :
                             homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
                         }
                         resources.getString(R.string.grid_filter) -> {
-                            adapter.setData(remoteList)
-                            binding.remoteList.adapter = adapter
-                            binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 2)
+                            gridAdapter.setData(remoteList)
+                            binding.remoteList.adapter = gridAdapter
+                            binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
                             touchCustomHelper.attachToRecyclerView(null)
                             homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
                             homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+                        }
+                        resources.getString(R.string.category_filter) -> {
+                            categoryAdapter.setData(data)
+                            binding.remoteList.adapter = categoryAdapter
+                            touchCustomHelper.attachToRecyclerView(null)
+                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                            homeViewModel.saveSortType(HomeViewModel.SortType.Category)
+                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
                         }
                     }
                     true
@@ -222,16 +252,13 @@ class HomeFragment(val callback: Callback) :
 
         touchHelper.attachToRecyclerView(binding.remoteList)
 
-        adapter.setOnItemTouchListener {
-            callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
-            setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to it.id))
-            screenNavigate(
-                fragmentManager,
-                MainActivity.Navigate.UP,
-                R.id.mainContainer,
-                AddFragment(callback)
-            )
-        }
+        adapter.setOnItemTouchListener {navigateUpdate(callback, it)}
+
+        gridAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
+
+        customAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
+
+        categoryAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
@@ -257,39 +284,19 @@ class HomeFragment(val callback: Callback) :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        logger.i("TT")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        logger.i("TT")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        logger.i("TT")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        logger.i("TT")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        logger.i("TT")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        logger.i("TT")
-    }
-
     /* **********************************************************************
      * Function
      ********************************************************************** */
+    private fun navigateUpdate(callback: Callback, remote: Remote){
+        callback.saveMessageAction(TAG_UPDATE_FRAGMENT)
+        setFragmentResult(ID_REQUEST_KEY, bundleOf(ID_ARG to remote.id))
+        screenNavigate(
+            fragmentManager,
+            MainActivity.Navigate.UP,
+            R.id.mainContainer,
+            AddFragment(callback)
+        )
+    }
 
     /* **********************************************************************
      * Class

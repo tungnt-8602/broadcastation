@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.broadcastation.databinding.ItemRemoteBinding
+import com.example.broadcastation.databinding.ItemRemoteLinearBinding
 import com.example.broadcastation.entity.Remote
 import com.example.broadcastation.entity.config.HttpConfig
 import com.example.broadcastation.presentation.home.HomeFragment
@@ -26,7 +26,7 @@ class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: 
     ********************************************************************** */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
-            ItemRemoteBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemRemoteLinearBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -93,7 +93,7 @@ class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: 
      ********************************************************************** */
     enum class Type { BLUETOOTH, HTTP, MQTT }
     enum class HttpMethod { GET, POST }
-    class ViewHolder(val binding: ItemRemoteBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemRemoteLinearBinding) : RecyclerView.ViewHolder(binding.root)
     interface Callback {
         fun shareBluetooth(remote: Remote, callback: HomeFragment.Callback)
         fun postHttp(remote: Remote)

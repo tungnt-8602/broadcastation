@@ -13,11 +13,10 @@ class HomeViewModel : BaseViewModel() {
     val undo = R.string.undo
     val deleteRemote = R.string.delete_remote
 
-    val noticeGetHttp = R.string.get_http_notice
-    val noticePostHttp = R.string.post_http_notice
-
     val noticeCustom = R.string.custom_noti
     val noticeNormal = R.string.normal_noti
+    val noticeGrid = R.string.grid_noti
+    val noticeCategory = R.string.category_noti
 
     val menuFilter = R.menu.filter_menu
 

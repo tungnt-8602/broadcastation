@@ -15,6 +15,16 @@
         <item name="android:textStyle">normal</item>
     </style>
 
+    <style name="RoundBtnTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="RoundBtnSubTitle" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">8sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="BaseButton">
         <item name="backgroundTint">@color/white</item>
     </style>

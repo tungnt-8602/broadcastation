@@ -61,6 +61,8 @@
     <string name="def_return">Trở về mặc định</string>
     <string name="custom_noti">Đã chuyển qua dạng Custom</string>
     <string name="normal_noti">Đã chuyển qua dạng Normal</string>
+    <string name="grid_noti">Đã chuyển qua dạng Grid</string>
+    <string name="category_noti">Đã chuyển qua dạng Category</string>
     <string name="normal_filter">Mặc định</string>
     <string name="category_filter">Theo danh mục</string>
     <string name="custom_filter">Tùy chỉnh</string>

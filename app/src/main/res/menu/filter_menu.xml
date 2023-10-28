@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/normal_filter"/>
-    <item android:title="@string/grid_filter"/>
-    <item android:title="@string/category_filter"/>
-    <item android:title="@string/custom_filter"/>
+    <item android:title="@string/normal_filter" android:icon="@drawable/ic_custom_filter"/>
+    <item android:title="@string/grid_filter" android:icon="@drawable/ic_grid_filter"/>
+    <item android:title="@string/category_filter" android:icon="@drawable/ic_category_filter"/>
+    <item android:title="@string/broadcast_filter" android:icon="@drawable/ic_broadcast_filter"/>
 </menu>

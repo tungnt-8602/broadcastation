@@ -14,7 +14,7 @@
         android:layout_marginStart="@dimen/space"
         android:contentDescription="@string/remote_icon"
         android:padding="@dimen/space"
-        android:src="@drawable/ic_local_fill"
+        android:src="@drawable/ic_local_grid"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView

@@ -12,11 +12,18 @@ class HomeViewModel : BaseViewModel() {
     val notice = MutableLiveData<String>()
     val undo = R.string.undo
     val deleteRemote = R.string.delete_remote
+    val undoDelete = R.string.undo_delete
+    val deleteConfirmTitle = R.string.delete_confirm_title
+    val deleteConfirmMessage = R.string.delete_confirm_message
+    val yesConfirm = R.string.yes_confirm
+    val noConfirm = R.string.no_confirm
 
     val noticeCustom = R.string.custom_noti
     val noticeNormal = R.string.normal_noti
     val noticeGrid = R.string.grid_noti
     val noticeCategory = R.string.category_noti
+    val noticeBroadcastType = R.string.broadcast_noti
+
 
     val menuFilter = R.menu.filter_menu
 
@@ -40,6 +47,6 @@ class HomeViewModel : BaseViewModel() {
         Normal,
         Grid,
         Category,
-        Custom
+        Broadcast
     }
 }

@@ -128,7 +128,7 @@ class Preference {
         return when(shared?.getString(sortRemote, "Normal")){
             "Grid" -> HomeViewModel.SortType.Grid
             "Category" -> HomeViewModel.SortType.Category
-            "Custom" -> HomeViewModel.SortType.Custom
+            "Broadcast" -> HomeViewModel.SortType.Broadcast
             else -> HomeViewModel.SortType.Normal
         }
     }
@@ -138,7 +138,7 @@ class Preference {
             HomeViewModel.SortType.Normal -> "Normal"
             HomeViewModel.SortType.Grid -> "Grid"
             HomeViewModel.SortType.Category -> "Category"
-            HomeViewModel.SortType.Custom -> "Custom"
+            HomeViewModel.SortType.Broadcast -> "Broadcast"
         }
         editor?.apply {
             putString(sortRemote, stringType)

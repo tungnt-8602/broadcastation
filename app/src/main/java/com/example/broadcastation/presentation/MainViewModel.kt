@@ -126,7 +126,7 @@ class MainViewModel : BaseViewModel() {
     fun publishMqtt(remoteR: Remote, callback: HomeFragment.Callback, context: Context) {
         logger.i("Mqtt broadcast: ${remoteR.name}")
         remote.createConnect(context)
-        callback.saveMessageBroadcast(remoteR.name)
+        callback.saveMessageBroadcast(remoteR.describe)
         remote.sendMessage(callback.getMessageBroadcast(), context)
     }
 

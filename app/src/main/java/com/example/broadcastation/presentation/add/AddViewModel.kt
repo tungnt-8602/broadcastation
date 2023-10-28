@@ -10,7 +10,7 @@ class AddViewModel : BaseViewModel() {
      ********************************************************************** */
     val notice = MutableLiveData<String>()
 
-    val listRemote = R.array.remote_menu
+    val listBroadcastType = R.array.broadcast_type_menu
     val listCategoryRemote = R.array.remote_category
 
     val dropdownItem = R.layout.dropdown_item

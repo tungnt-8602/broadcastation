@@ -1,6 +1,7 @@
 package com.example.broadcastation.presentation.home
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Build
@@ -35,15 +36,14 @@ import com.example.broadcastation.presentation.MainActivity
 import com.example.broadcastation.presentation.MainViewModel
 import com.example.broadcastation.presentation.add.AddFragment
 import com.example.broadcastation.presentation.home.item.ItemMoveCustomCallback
+import com.example.broadcastation.presentation.home.item.ItemRemoteBroadcastAdapter
 import com.example.broadcastation.presentation.home.item.ItemRemoteCategoryAdapter
 import com.example.broadcastation.presentation.home.item.ItemRemoteCustomAdapter
 import com.example.broadcastation.presentation.home.item.ItemRemoteGridAdapter
-import com.example.broadcastation.presentation.home.item.ItemRemoteNormalAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
-
 
 class HomeFragment(val callback: Callback) :
     BaseFragment<HomeFragmentBinding>(HomeFragmentBinding::inflate) {
@@ -56,12 +56,22 @@ class HomeFragment(val callback: Callback) :
     lateinit var type: Type
     val gson = Gson()
     private lateinit var config: Config
+    private lateinit var categoryData: MutableMap<MutableList<Any>, MutableList<Remote>>
+    private lateinit var broadcastData: MutableMap<MutableList<Any>, MutableList<Remote>>
+    private lateinit var remoteList: MutableList<Remote>
+    private lateinit var itemCallBack : ItemRemoteCustomAdapter.Callback
+    private lateinit var gridAdapter : ItemRemoteGridAdapter
+    private lateinit var categoryAdapter : ItemRemoteCategoryAdapter
+    private lateinit var broadcastAdapter : ItemRemoteBroadcastAdapter
+    private lateinit var customAdapter : ItemRemoteCustomAdapter
+    private lateinit var itemCustomCallback: ItemTouchHelper.Callback
+    private lateinit var touchCustomHelper: ItemTouchHelper
 
     /* **********************************************************************
      * Life Cycle
      ********************************************************************** */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @SuppressLint("SuspiciousIndentation")
+    @SuppressLint("SuspiciousIndentation", "RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (!isAdded) {
@@ -70,7 +80,7 @@ class HomeFragment(val callback: Callback) :
         fragmentManager = parentFragmentManager
 
         logger.i("Empty/list display")
-        val remoteList = callback.getAllRemote()
+        remoteList = callback.getAllRemote()
         if (remoteList.isEmpty()) {
             binding.empty.visibility = View.VISIBLE
             binding.remoteList.visibility = View.GONE
@@ -80,13 +90,13 @@ class HomeFragment(val callback: Callback) :
         }
 
         logger.i("Common item callback for all adapter")
-        val itemCallBack = object : ItemRemoteCustomAdapter.Callback {
+        itemCallBack = object : ItemRemoteCustomAdapter.Callback {
             override fun shareBluetooth(remote: Remote, callback: Callback) {
                 val isTurnedOn =
                     activity?.getSystemService(BluetoothManager::class.java)?.adapter?.isEnabled
                 try {
                     if (isTurnedOn == true) {
-                        viewModel.shareBluetooth(remote, callback)
+                        callback.shareBluetooth(remote, callback)
                         type = object : TypeToken<BluetoothConfig>() {}.type
                         config = gson.fromJson(remote.config, type)
                         callback.saveMessageBroadcast((config as BluetoothConfig).content)
@@ -122,12 +132,16 @@ class HomeFragment(val callback: Callback) :
             }
         }
 
-        val adapter = ItemRemoteNormalAdapter(callback = itemCallBack, callback)
-        val gridAdapter = ItemRemoteGridAdapter(callback = itemCallBack, callback)
-        val categoryAdapter = ItemRemoteCategoryAdapter(callback = itemCallBack, callback)
-        val customAdapter = ItemRemoteCustomAdapter(callback = itemCallBack, callback)
-        val itemCustomCallback: ItemTouchHelper.Callback = ItemMoveCustomCallback(customAdapter)
-        val touchCustomHelper = ItemTouchHelper(itemCustomCallback)
+        categoryData = remoteToDataList(callback.getAllRemote(), HomeViewModel.SortType.Category)
+        broadcastData = remoteToDataList(callback.getAllRemote(), HomeViewModel.SortType.Broadcast)
+
+//        val adapter = ItemRemoteNormalAdapter(callback = itemCallBack, callback)
+        gridAdapter = ItemRemoteGridAdapter(callback = itemCallBack, callback)
+        categoryAdapter = ItemRemoteCategoryAdapter(callback = itemCallBack, callback)
+        broadcastAdapter = ItemRemoteBroadcastAdapter(callback = itemCallBack, callback)
+        customAdapter = ItemRemoteCustomAdapter(callback = itemCallBack, callback)
+        itemCustomCallback = ItemMoveCustomCallback(customAdapter)
+        touchCustomHelper = ItemTouchHelper(itemCustomCallback)
         val touchHelper = ItemTouchHelper(object :
             ItemTouchHelper.SimpleCallback(DRAG_DIRS, ItemTouchHelper.END) {
             override fun onMove(
@@ -138,112 +152,122 @@ class HomeFragment(val callback: Callback) :
                 return false
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val position = viewHolder.adapterPosition
                 val deletedRemote: Remote = remoteList[position]
                 remoteList.removeAt(position)
                 this@HomeFragment.callback.updateRemote(remoteList)
-                adapter.setData(remoteList)
-
-                // below line is to display our snackbar with action.
-                Snackbar.make(
-                    binding.root,
-                    "${resources.getString(homeViewModel.deleteRemote)} ${deletedRemote.name}",
-                    Snackbar.LENGTH_LONG
-                )
-                    .setAnchorView(binding.add)
-                    .setAction(homeViewModel.undo) {
-                        remoteList.add(position, deletedRemote)
-                        this@HomeFragment.callback.updateRemote(remoteList)
-                        adapter.setData(remoteList)
-                    }.show()
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle(resources.getString(homeViewModel.deleteConfirmTitle))
+                builder.setMessage(resources.getString(homeViewModel.deleteConfirmMessage))
+                builder.setPositiveButton(resources.getString(homeViewModel.yesConfirm)) { _,_ ->
+                    notifyDataChangeAllAdapter(remoteList)
+                    Snackbar.make(
+                        binding.root,
+                        "${resources.getString(homeViewModel.deleteRemote)} ${deletedRemote.name}",
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAnchorView(binding.add)
+                        .setAction(homeViewModel.undo) {
+                            remoteList.add(position, deletedRemote)
+                            this@HomeFragment.callback.updateRemote(remoteList)
+                            notifyDataChangeAllAdapter(remoteList)
+                        }.show()
+                }
+                builder.setNegativeButton(resources.getString(homeViewModel.noConfirm)){_,_ ->
+                    remoteList.add(position, deletedRemote)
+                    this@HomeFragment.callback.updateRemote(remoteList)
+                    notifyDataChangeAllAdapter(remoteList)
+                    Snackbar.make(
+                        binding.root,
+                        resources.getString(homeViewModel.undoDelete),
+                        Snackbar.LENGTH_LONG
+                    )
+                        .setAnchorView(binding.add)
+                        .show()
+                }
+                builder.show()
             }
         })
 
-        val data = mutableMapOf<MutableList<Any>, MutableList<Remote>>()
-        for(remote in remoteList){
-            val key : MutableList<Any> = mutableListOf(remote.category)
-            if (!data.containsKey(key)) {
-                data[key] = mutableListOf()
-                data[key]?.add(remote)
-            }else{
-                data[key]?.add(remote)
-            }
-        }
+        bindAdapter(homeViewModel.getSortType().toString())
 
-        when(homeViewModel.getSortType()){
-            HomeViewModel.SortType.Normal-> {
-                adapter.setData(remoteList)
-                binding.remoteList.adapter = adapter
-                touchCustomHelper.attachToRecyclerView(null)
-                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
-                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
-            }
-            HomeViewModel.SortType.Custom -> {
-                customAdapter.setData(remoteList)
-                binding.remoteList.adapter = customAdapter
-                touchCustomHelper.attachToRecyclerView(binding.remoteList)
-                homeViewModel.saveSortType(HomeViewModel.SortType.Custom)
-                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
-            }
-            HomeViewModel.SortType.Grid -> {
-                gridAdapter.setData(remoteList)
-                binding.remoteList.adapter = gridAdapter
-                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
-                touchCustomHelper.attachToRecyclerView(null)
-                homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
-                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeGrid))
-            }
-            HomeViewModel.SortType.Category -> {
-                categoryAdapter.setData(data)
-                logger.i("ttt $data")
-                binding.remoteList.adapter = categoryAdapter
-                touchCustomHelper.attachToRecyclerView(null)
-                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
-                homeViewModel.saveSortType(HomeViewModel.SortType.Category)
-                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
-            }
-        }
+//        when(homeViewModel.getSortType()){
+//            HomeViewModel.SortType.Normal-> {
+//                customAdapter.setData(remoteList)
+//                binding.remoteList.adapter = customAdapter
+//                touchCustomHelper.attachToRecyclerView(binding.remoteList)
+//                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+//                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+//            }
+//            HomeViewModel.SortType.Grid -> {
+//                gridAdapter.setData(remoteList)
+//                binding.remoteList.adapter = gridAdapter
+//                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
+//                touchCustomHelper.attachToRecyclerView(null)
+//                homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
+//                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeGrid))
+//            }
+//            HomeViewModel.SortType.Category -> {
+//                categoryAdapter.setData(categoryData)
+//                binding.remoteList.adapter = categoryAdapter
+//                touchCustomHelper.attachToRecyclerView(null)
+//                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+//                homeViewModel.saveSortType(HomeViewModel.SortType.Category)
+//                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
+//            }
+//            HomeViewModel.SortType.Broadcast -> {
+//                broadcastAdapter.setData(broadcastData)
+//                binding.remoteList.adapter = broadcastAdapter
+//                touchCustomHelper.attachToRecyclerView(null)
+//                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+//                homeViewModel.saveSortType(HomeViewModel.SortType.Broadcast)
+//                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeBroadcastType))
+//            }
+//        }
 
         binding.sortRemote.setOnClickListener {
             val popup = PopupMenu(requireContext(), it)
             popup.apply {
                 menuInflater.inflate(homeViewModel.menuFilter, popup.menu)
+                setForceShowIcon(true)
                 setOnMenuItemClickListener { menuItem: MenuItem ->
-                    when (menuItem.title) {
-                        resources.getString(R.string.normal_filter)-> {
-                            adapter.setData(remoteList)
-                            binding.remoteList.adapter = adapter
-                            touchCustomHelper.attachToRecyclerView(null)
-                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
-                            homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
-                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
-                        }
-                        resources.getString(R.string.custom_filter) -> {
-                            customAdapter.setData(remoteList)
-                            binding.remoteList.adapter = customAdapter
-                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
-                            touchCustomHelper.attachToRecyclerView(binding.remoteList)
-                            homeViewModel.saveSortType(HomeViewModel.SortType.Custom)
-                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCustom))
-                        }
-                        resources.getString(R.string.grid_filter) -> {
-                            gridAdapter.setData(remoteList)
-                            binding.remoteList.adapter = gridAdapter
-                            binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
-                            touchCustomHelper.attachToRecyclerView(null)
-                            homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
-                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
-                        }
-                        resources.getString(R.string.category_filter) -> {
-                            categoryAdapter.setData(data)
-                            binding.remoteList.adapter = categoryAdapter
-                            touchCustomHelper.attachToRecyclerView(null)
-                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
-                            homeViewModel.saveSortType(HomeViewModel.SortType.Category)
-                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
-                        }
-                    }
+                    bindAdapter(menuItem.title.toString())
+//                    when (menuItem.title) {
+//                        resources.getString(R.string.normal_filter)-> {
+//                            customAdapter.setData(remoteList)
+//                            binding.remoteList.adapter = customAdapter
+//                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+//                            touchCustomHelper.attachToRecyclerView(binding.remoteList)
+//                            homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+//                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+//                        }
+//                        resources.getString(R.string.grid_filter) -> {
+//                            gridAdapter.setData(remoteList)
+//                            binding.remoteList.adapter = gridAdapter
+//                            binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
+//                            touchCustomHelper.attachToRecyclerView(null)
+//                            homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
+//                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+//                        }
+//                        resources.getString(R.string.category_filter) -> {
+//                            categoryAdapter.setData(categoryData)
+//                            binding.remoteList.adapter = categoryAdapter
+//                            touchCustomHelper.attachToRecyclerView(null)
+//                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+//                            homeViewModel.saveSortType(HomeViewModel.SortType.Category)
+//                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
+//                        }
+//                        resources.getString(R.string.broadcast_filter) -> {
+//                            broadcastAdapter.setData(broadcastData)
+//                            binding.remoteList.adapter = broadcastAdapter
+//                            touchCustomHelper.attachToRecyclerView(null)
+//                            binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+//                            homeViewModel.saveSortType(HomeViewModel.SortType.Broadcast)
+//                            homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeBroadcastType))
+//                        }
+//                    }
                     true
                 }
                 show()
@@ -252,13 +276,13 @@ class HomeFragment(val callback: Callback) :
 
         touchHelper.attachToRecyclerView(binding.remoteList)
 
-        adapter.setOnItemTouchListener {navigateUpdate(callback, it)}
+        customAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
 
         gridAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
 
-        customAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
-
         categoryAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
+
+        broadcastAdapter.setOnItemTouchListener {navigateUpdate(callback, it)}
 
         binding.add.setOnClickListener {
             logger.i("Add button navigate to add fragment")
@@ -296,6 +320,72 @@ class HomeFragment(val callback: Callback) :
             R.id.mainContainer,
             AddFragment(callback)
         )
+    }
+
+    private fun remoteToDataList(remoteList : MutableList<Remote>, filter: HomeViewModel.SortType) : MutableMap<MutableList<Any>, MutableList<Remote>>{
+        val mapData = mutableMapOf<MutableList<Any>, MutableList<Remote>>()
+        for(remote in remoteList){
+            val key : MutableList<Any> = mutableListOf()
+            if(filter == HomeViewModel.SortType.Category){
+                key.add(remote.category)
+            }else if(filter == HomeViewModel.SortType.Broadcast){
+                key.add(remote.type.toString())
+            }
+            if (!mapData.containsKey(key)) {
+                mapData[key] = mutableListOf()
+                mapData[key]?.add(remote)
+            }else{
+                mapData[key]?.add(remote)
+            }
+        }
+        return mapData
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun notifyDataChangeAllAdapter(remoteList: MutableList<Remote>){
+        customAdapter.notifyDataSetChanged()
+        gridAdapter.notifyDataSetChanged()
+        categoryData = remoteToDataList(remoteList, HomeViewModel.SortType.Category)
+        broadcastData = remoteToDataList(remoteList, HomeViewModel.SortType.Broadcast)
+        categoryAdapter.notifyDataSetChanged()
+        broadcastAdapter.notifyDataSetChanged()
+    }
+
+    private fun bindAdapter(sortType : String){
+        when(sortType){
+            resources.getString(R.string.normal_filter)-> {
+                customAdapter.setData(remoteList)
+                binding.remoteList.adapter = customAdapter
+                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                touchCustomHelper.attachToRecyclerView(binding.remoteList)
+                homeViewModel.saveSortType(HomeViewModel.SortType.Normal)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+            }
+            resources.getString(R.string.grid_filter) -> {
+                gridAdapter.setData(remoteList)
+                binding.remoteList.adapter = gridAdapter
+                binding.remoteList.layoutManager = GridLayoutManager(requireContext(), 3)
+                touchCustomHelper.attachToRecyclerView(null)
+                homeViewModel.saveSortType(HomeViewModel.SortType.Grid)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeNormal))
+            }
+            resources.getString(R.string.category_filter) -> {
+                categoryAdapter.setData(categoryData)
+                binding.remoteList.adapter = categoryAdapter
+                touchCustomHelper.attachToRecyclerView(null)
+                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                homeViewModel.saveSortType(HomeViewModel.SortType.Category)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeCategory))
+            }
+            resources.getString(R.string.broadcast_filter) -> {
+                broadcastAdapter.setData(broadcastData)
+                binding.remoteList.adapter = broadcastAdapter
+                touchCustomHelper.attachToRecyclerView(null)
+                binding.remoteList.layoutManager = LinearLayoutManager(requireContext())
+                homeViewModel.saveSortType(HomeViewModel.SortType.Broadcast)
+                homeViewModel.noticeBroadcast(resources.getString(homeViewModel.noticeBroadcastType))
+            }
+        }
     }
 
     /* **********************************************************************

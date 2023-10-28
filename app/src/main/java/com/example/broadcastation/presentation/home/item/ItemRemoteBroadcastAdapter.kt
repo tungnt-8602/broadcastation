@@ -16,17 +16,16 @@ import com.example.broadcastation.presentation.home.HomeFragment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
-@Suppress("NAME_SHADOWING")
-class ItemRemoteCategoryAdapter(
+class ItemRemoteBroadcastAdapter (
     var callback: ItemRemoteCustomAdapter.Callback,
     private var homeCallback: HomeFragment.Callback
 ) :
-    RecyclerView.Adapter<ItemRemoteCategoryAdapter.ViewHolder>() {
+    RecyclerView.Adapter<ItemRemoteBroadcastAdapter.ViewHolder>() {
 
     /* **********************************************************************
      * Variable
      ********************************************************************** */
-    private var data = listOf<Data>()
+    private var data = listOf<ItemRemoteCategoryAdapter.Data>()
     private var onItemTouchListener: ((Remote) -> Unit)? = null
     private var map = mutableMapOf<MutableList<Any>, MutableList<Remote>>()
     private var showTitle: Boolean = true
@@ -51,7 +50,7 @@ class ItemRemoteCategoryAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (data[position].type == Type.Category) {
+        return if (data[position].type == ItemRemoteCategoryAdapter.Type.Category) {
             1
         } else
             2
@@ -82,13 +81,13 @@ class ItemRemoteCategoryAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun setData(data: MutableMap<MutableList<Any>, MutableList<Remote>>) {
         this.map = data
-        val newData = mutableListOf<Data>()
+        val newData = mutableListOf<ItemRemoteCategoryAdapter.Data>()
         for ((key, value) in map) {
-            newData.add(Data(Type.Category, key))
+            newData.add(ItemRemoteCategoryAdapter.Data(ItemRemoteCategoryAdapter.Type.Category, key))
             for (remote in value) {
                 newData.add(
-                    Data(
-                        Type.Remote,
+                    ItemRemoteCategoryAdapter.Data(
+                        ItemRemoteCategoryAdapter.Type.Remote,
                         mutableListOf(
                             remote.id,
                             remote.name,
@@ -191,11 +190,5 @@ class ItemRemoteCategoryAdapter(
             }
         }
     }
-
-    enum class Type {
-        Category, Remote
-    }
-
-    data class Data(val type: Type, val content: MutableList<Any>)
 
 }

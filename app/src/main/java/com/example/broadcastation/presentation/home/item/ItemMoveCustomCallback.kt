@@ -1,5 +1,6 @@
 package com.example.broadcastation.presentation.home.item
 
+import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
@@ -27,8 +28,23 @@ class ItemMoveCustomCallback(private val mAdapter: ItemTouchHelperContract?) :
         target: RecyclerView.ViewHolder
     ): Boolean {
         mAdapter?.onRowMoved(viewHolder.adapterPosition, target.adapterPosition)
+        Log.d("thetung", "onMove: ${viewHolder.adapterPosition} to ${target.adapterPosition}")
         return true
     }
+
+//    override fun onMoved(
+//        recyclerView: RecyclerView,
+//        viewHolder: RecyclerView.ViewHolder,
+//        fromPos: Int,
+//        target: RecyclerView.ViewHolder,
+//        toPos: Int,
+//        x: Int,
+//        y: Int
+//    ) {
+//        super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
+//        Log.d("thetung", "onMoved: $fromPos to $toPos")
+//        mAdapter?.onRowMoved(fromPos, toPos)
+//    }
 
     override fun onSelectedChanged(
         viewHolder: RecyclerView.ViewHolder?,

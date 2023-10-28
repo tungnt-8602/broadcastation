@@ -7,10 +7,14 @@ class StorageControl : BaseControl() {
      * Variable
      ********************************************************************** */
 
+
     var advertisingName = ""
-    var domainMqtt = "tcp://mqtt.bctoyz.com:1883"
-    val userName = "Android"
-    val passWord = "android123"
+//    var domainMqtt = "tcp://mqtt.bctoyz.com:1883"
+//    val userName = "Android"
+//    val passWord = "android123"
+    var domainMqtt = "aicontent.bctoyz.com"
+    val userName = "tuvc@admin.com"
+    val passWord = "Tu123456"
     var channel = "event1/all"
     var port = ""
     var content = ""

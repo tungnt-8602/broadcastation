@@ -63,12 +63,21 @@
     <string name="normal_noti">Đã chuyển qua dạng Normal</string>
     <string name="grid_noti">Đã chuyển qua dạng Grid</string>
     <string name="category_noti">Đã chuyển qua dạng Category</string>
-    <string name="normal_filter">Mặc định</string>
-    <string name="category_filter">Theo danh mục</string>
-    <string name="custom_filter">Tùy chỉnh</string>
-    <string name="grid_filter">Dạng lưới</string>
+    <string name="normal_filter">Normal</string>
+    <string name="category_filter">Category</string>
+    <string name="custom_filter">Custom</string>
+    <string name="grid_filter">Grid</string>
+    <string name="broadcast_filter">Broadcast</string>
+    <string name="broadcast_noti">Đã chuyển qua dạng Broadcast</string>
+    <string name="undo_delete">Cẩn thận lần sau nhé !</string>
+    <string name="delete_confirm_title">Xóa điều khiển</string>
+    <string name="delete_confirm_message">Bạn đã chắc chắn muốn xóa điều khiển này chưa ?</string>
+    <string name="yes_confirm">Xác nhận</string>
+    <string name="no_confirm">Từ chối</string>
+    <string name="username_mqtt">Tên người dùng</string>
+    <string name="password_mqtt">Mật khẩu</string>
 
-    <string-array name="remote_menu">
+    <string-array name="broadcast_type_menu">
         <item>Bluetooth</item>
         <item>Http</item>
         <item>Mqtt</item>

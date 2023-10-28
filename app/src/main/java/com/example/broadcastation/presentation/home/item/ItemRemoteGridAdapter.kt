@@ -44,7 +44,7 @@ class ItemRemoteGridAdapter(var callback: ItemRemoteCustomAdapter.Callback, priv
             remoteType.setImageResource(item.icon)
             remoteDescribe.text = item.describe
         }
-        holder.binding.remoteBroadcast.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             when (data[position].type) {
                 ItemRemoteCustomAdapter.Type.BLUETOOTH -> {
                     callback.shareBluetooth(data[position], homeCallback)

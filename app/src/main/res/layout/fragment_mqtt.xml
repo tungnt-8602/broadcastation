@@ -21,6 +21,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/domain_text"
             style="@style/SettingInput"
+            android:inputType="textUri"
             android:layout_width="match_parent"
             android:layout_height="@dimen/icon_size"
             android:hint="@string/domain_mqtt" />
@@ -65,7 +66,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/mqtt_content"
+        android:id="@+id/username"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -74,6 +75,44 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/channel">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username_text"
+            style="@style/SettingInput"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/icon_size"
+            android:hint="@string/username_mqtt" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/password"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_large"
+        android:layout_marginTop="@dimen/space"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/username">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/password_text"
+            style="@style/SettingInput"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/icon_size"
+            android:hint="@string/password_mqtt" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/mqtt_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/space_large"
+        android:layout_marginTop="@dimen/space"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/password">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/mqtt_content_text"

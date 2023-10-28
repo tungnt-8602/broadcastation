@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.util.Collections
 
+@SuppressLint("NotifyDataSetChanged")
 class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: HomeFragment.Callback) :
     RecyclerView.Adapter<ItemRemoteCustomAdapter.ViewHolder>(),
     ItemMoveCustomCallback.ItemTouchHelperContract {
@@ -73,6 +74,30 @@ class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: 
         }
     }
 
+    override fun onRowMoved(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(data, i, i + 1)
+                reOrderRemote(i, i+1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(data, i, i - 1)
+                reOrderRemote(i, i-1)
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun onRowSelected(myViewHolder: ViewHolder?) {
+//        myViewHolder?.itemView?.setBackgroundResource(R.color.scc_100)
+    }
+
+    override fun onRowClear(myViewHolder: ViewHolder?) {
+//        myViewHolder?.itemView?.setBackgroundColor(Color.WHITE)
+        notifyDataSetChanged()
+    }
+
     /* **********************************************************************
     * Function
     ********************************************************************** */
@@ -88,6 +113,12 @@ class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: 
         notifyDataSetChanged()
     }
 
+    private fun reOrderRemote(fromPosition: Int, toPosition: Int){
+        val remoteList = homeCallback.getAllRemote()
+        Collections.swap(remoteList, fromPosition, toPosition)
+        homeCallback.updateRemote(remoteList)
+    }
+
     /* **********************************************************************
      * Class
      ********************************************************************** */
@@ -99,26 +130,5 @@ class ItemRemoteCustomAdapter(var callback: Callback, private var homeCallback: 
         fun postHttp(remote: Remote)
         fun getHttp(remote: Remote)
         fun publishMqtt(remote: Remote)
-    }
-
-    override fun onRowMoved(fromPosition: Int, toPosition: Int) {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                Collections.swap(data, i, i + 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(data, i, i - 1)
-            }
-        }
-        notifyItemMoved(fromPosition, toPosition)
-    }
-
-    override fun onRowSelected(myViewHolder: ViewHolder?) {
-//        myViewHolder?.itemView?.setBackgroundResource(R.color.scc_100)
-    }
-
-    override fun onRowClear(myViewHolder: ViewHolder?) {
-//        myViewHolder?.itemView?.setBackgroundColor(Color.WHITE)
     }
 }
